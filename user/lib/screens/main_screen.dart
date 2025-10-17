@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'home_screen.dart';
 import 'lost_pets_screen.dart';
 import 'adoption_screen.dart';
@@ -23,44 +24,102 @@ class _MainScreenState extends State<MainScreen> {
     const ProfileScreen(),
   ];
 
-  final List<BottomNavigationBarItem> _bottomNavItems = [
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.home),
-      label: 'الرئيسية',
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.search),
-      label: 'مفقودات',
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.favorite),
-      label: 'تبني',
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.medical_services),
-      label: 'لقاحات',
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.person),
-      label: 'حسابي',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Colors.grey,
-        items: _bottomNavItems,
+      bottomNavigationBar: _buildBottomNavigationBar(context),
+    );
+  }
+
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    return Container(
+      height: 85,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 5),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildNavItem(context, 1, Icons.search, 'مفقودات', false),
+          _buildNavItem(context, 2, Icons.favorite, 'تبني', false),
+          _buildNavItem(context, 0, Icons.home, 'الرئيسية', true),
+          _buildNavItem(context, 3, Icons.medical_services, 'لقاحات', false),
+          _buildNavItem(context, 4, Icons.person, 'حسابي', false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(
+    BuildContext context,
+    int index,
+    IconData icon,
+    String label,
+    bool isHome,
+  ) {
+    final isSelected = _currentIndex == index;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        width: isSelected && isHome ? 70 : 50,
+        height: isSelected && isHome ? 70 : 50,
+        decoration: BoxDecoration(
+          color: isSelected && isHome
+              ? const Color(0xFF4CAF50)
+              : isSelected
+              ? primaryColor.withOpacity(0.1)
+              : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: isSelected && isHome ? 28 : 22,
+              color: isSelected
+                  ? isHome
+                        ? Colors.white
+                        : primaryColor
+                  : Colors.grey.shade500,
+            ),
+            if (isHome) const SizedBox(height: 2),
+            if (isHome)
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: isSelected ? 9 : 8,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? Colors.white : Colors.grey.shade500,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
