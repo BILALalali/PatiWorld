@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/adoption_pet.dart';
 import '../constants/app_constants.dart';
 import 'add_adoption_pet_screen.dart';
@@ -21,48 +22,32 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
   }
 
   Future<void> _loadAdoptionPets() async {
-    // بيانات تجريبية لإعلانات التبني
-    setState(() {
-      adoptionPets = [
-        AdoptionPet(
-          id: '1',
-          name: 'Küçük Kedi',
-          type: 'Kedi',
-          imageUrl:
-              'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
-          description:
-              'Sıcak bir yuva arayan güzel küçük kedi, çok sevimli ve aileler için uygun',
-          city: 'İzmir',
-          contactNumber: '0501234567',
-          whatsappNumber: '0501234567',
-          age: 3, // 3 ay
-          gender: 'Dişi',
-          isVaccinated: true,
-          isNeutered: false,
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-          userId: 'user1',
-        ),
-        AdoptionPet(
-          id: '2',
-          name: 'Labrador Köpek',
-          type: 'Köpek',
-          imageUrl:
-              'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400',
-          description:
-              'Sevimli ve zeki Labrador köpek, çocuklu aileler için uygun',
-          city: 'Ankara',
-          contactNumber: '0507654321',
-          whatsappNumber: '0507654321',
-          age: 12, // 12 ay
-          gender: 'Erkek',
-          isVaccinated: true,
-          isNeutered: true,
-          createdAt: DateTime.now().subtract(const Duration(days: 3)),
-          userId: 'user2',
-        ),
-      ];
-      isLoading = false;
-    });
+    try {
+      final response = await Supabase.instance.client
+          .from(AppConstants.adoptionPetsTable)
+          .select()
+          .eq('is_active', true)
+          .order('created_at', ascending: false);
+
+      setState(() {
+        adoptionPets = (response as List)
+            .map((json) => AdoptionPet.fromJson(json))
+            .toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Veriler yüklenirken hata oluştu: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -102,14 +87,14 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
           Icon(Icons.favorite_border, size: 100, color: Colors.grey[400]),
           const SizedBox(height: AppConstants.mediumPadding),
           Text(
-            'لا توجد إعلانات تبني حالياً',
+            'Şu anda sahiplendirme ilanı bulunmuyor',
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'كن أول من يضيف إعلان للتبني',
+            'İlk sahiplendirme ilanını sen ekle',
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
@@ -209,7 +194,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                         ),
                       ),
                       child: Text(
-                        'للتبني',
+                        'Sahiplendirme',
                         style: TextStyle(
                           color: Colors.blue[700],
                           fontWeight: FontWeight.bold,
@@ -239,7 +224,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                   children: [
                     _buildInfoChip(
                       Icons.cake,
-                      '${adoptionPet.age} شهر',
+                      '${adoptionPet.age} Ay',
                       Colors.orange,
                     ),
                     const SizedBox(width: 8),
@@ -263,13 +248,13 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                 Row(
                   children: [
                     _buildStatusChip(
-                      'مطعم',
+                      'Aşılı',
                       adoptionPet.isVaccinated,
                       Colors.green,
                     ),
                     const SizedBox(width: 8),
                     _buildStatusChip(
-                      'معقم',
+                      'Kısırlaştırılmış',
                       adoptionPet.isNeutered,
                       Colors.blue,
                     ),
@@ -286,7 +271,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                         onPressed: () =>
                             _makePhoneCall(adoptionPet.contactNumber),
                         icon: const Icon(Icons.phone, size: 18),
-                        label: const Text('اتصال'),
+                        label: const Text('Ara'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(
                             context,
@@ -304,7 +289,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                         onPressed: () =>
                             _openWhatsApp(adoptionPet.whatsappNumber),
                         icon: const Icon(Icons.message, size: 18),
-                        label: const Text('واتساب'),
+                        label: const Text('WhatsApp'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
@@ -387,11 +372,19 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
-    _showInfoSnackBar('سيتم فتح تطبيق الهاتف للرقم: $phoneNumber');
+    // Remove any spaces or special characters for phone call
+    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+    _showInfoSnackBar('Telefon uygulaması açılacak: $cleanNumber');
+    // TODO: Implement actual phone call functionality
+    // await launch('tel:$cleanNumber');
   }
 
   Future<void> _openWhatsApp(String phoneNumber) async {
-    _showInfoSnackBar('سيتم فتح تطبيق الواتساب للرقم: $phoneNumber');
+    // Remove any spaces or special characters for WhatsApp
+    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+    _showInfoSnackBar('WhatsApp uygulaması açılacak: $cleanNumber');
+    // TODO: Implement actual WhatsApp functionality
+    // await launch('https://wa.me/$cleanNumber');
   }
 
   void _showInfoSnackBar(String message) {

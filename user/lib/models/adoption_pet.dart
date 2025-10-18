@@ -7,10 +7,10 @@ class AdoptionPet {
   final String city;
   final String contactNumber;
   final String whatsappNumber;
-  final int age; // العمر بالأشهر
-  final String gender; // الجنس
-  final bool isVaccinated; // هل تم تطعيمه
-  final bool isNeutered; // هل تم تعقيمه
+  final int age; // Age in months
+  final String gender; // Gender
+  final bool isVaccinated; // Is vaccinated
+  final bool isNeutered; // Is neutered
   final DateTime createdAt;
   final String userId;
 
@@ -45,7 +45,9 @@ class AdoptionPet {
       gender: json['gender'] ?? '',
       isVaccinated: json['is_vaccinated'] ?? false,
       isNeutered: json['is_neutered'] ?? false,
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        json['created_at'] ?? DateTime.now().toIso8601String(),
+      ),
       userId: json['user_id'] ?? '',
     );
   }

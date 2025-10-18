@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/app_constants.dart';
+import '../models/adoption_pet.dart';
 
 class AddAdoptionPetScreen extends StatefulWidget {
   const AddAdoptionPetScreen({super.key});
@@ -19,6 +21,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
   String _selectedType = AppConstants.petTypes.first;
   String _selectedCity = AppConstants.cities.first;
   String _selectedGender = AppConstants.genderOptions.first;
+  String _selectedCountryCode = '+90'; // Default to Turkey
   bool _isVaccinated = false;
   bool _isNeutered = false;
   bool _isLoading = false;
@@ -37,7 +40,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('إضافة إعلان تبني'),
+        title: const Text('Sahiplendirme İlanı Ekle'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -63,11 +66,11 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 // Pet Name
                 _buildTextField(
                   controller: _nameController,
-                  label: 'اسم الحيوان',
-                  hint: 'أدخل اسم الحيوان',
+                  label: 'Hayvan Adı',
+                  hint: 'Hayvanın adını girin',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال اسم الحيوان';
+                      return 'Lütfen hayvan adını girin';
                     }
                     return null;
                   },
@@ -77,7 +80,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
 
                 // Pet Type
                 _buildDropdown(
-                  label: 'نوع الحيوان',
+                  label: 'Hayvan Türü',
                   value: _selectedType,
                   items: AppConstants.petTypes,
                   onChanged: (value) {
@@ -92,13 +95,13 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 // Description
                 _buildTextField(
                   controller: _descriptionController,
-                  label: 'وصف الحيوان',
+                  label: 'Hayvan Açıklaması',
                   hint:
-                      'صف الحيوان بالتفصيل (اللون، الحجم، المميزات، السلوك...)',
+                      'Hayvanı detaylı olarak açıklayın (renk, boyut, özellikler, davranış...)',
                   maxLines: 3,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال وصف الحيوان';
+                      return 'Lütfen hayvan açıklaması girin';
                     }
                     return null;
                   },
@@ -108,7 +111,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
 
                 // City
                 _buildDropdown(
-                  label: 'المدينة',
+                  label: 'Şehir',
                   value: _selectedCity,
                   items: AppConstants.cities,
                   onChanged: (value) {
@@ -123,15 +126,15 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 // Age
                 _buildTextField(
                   controller: _ageController,
-                  label: 'العمر (بالأشهر)',
-                  hint: 'أدخل العمر بالأشهر',
+                  label: 'Yaş (Ay)',
+                  hint: 'Yaşını ay olarak girin',
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال العمر';
+                      return 'Lütfen yaş girin';
                     }
                     if (int.tryParse(value) == null) {
-                      return 'يرجى إدخال رقم صحيح';
+                      return 'Lütfen geçerli bir sayı girin';
                     }
                     return null;
                   },
@@ -141,7 +144,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
 
                 // Gender
                 _buildDropdown(
-                  label: 'الجنس',
+                  label: 'Cinsiyet',
                   value: _selectedGender,
                   items: AppConstants.genderOptions,
                   onChanged: (value) {
@@ -159,38 +162,30 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 const SizedBox(height: AppConstants.mediumPadding),
 
                 // Contact Number
-                _buildTextField(
+                _buildPhoneNumberField(
                   controller: _contactNumberController,
-                  label: 'رقم الهاتف',
-                  hint: '05xxxxxxxx',
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال رقم الهاتف';
-                    }
-                    if (value.length < 10) {
-                      return 'رقم الهاتف يجب أن يكون 10 أرقام على الأقل';
-                    }
-                    return null;
+                  label: 'Telefon Numarası',
+                  hint: '5xxxxxxxx',
+                  selectedCountryCode: _selectedCountryCode,
+                  onCountryCodeChanged: (value) {
+                    setState(() {
+                      _selectedCountryCode = value!;
+                    });
                   },
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
 
                 // WhatsApp Number
-                _buildTextField(
+                _buildPhoneNumberField(
                   controller: _whatsappNumberController,
-                  label: 'رقم الواتساب',
-                  hint: '05xxxxxxxx',
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال رقم الواتساب';
-                    }
-                    if (value.length < 10) {
-                      return 'رقم الواتساب يجب أن يكون 10 أرقام على الأقل';
-                    }
-                    return null;
+                  label: 'WhatsApp Numarası',
+                  hint: '5xxxxxxxx',
+                  selectedCountryCode: _selectedCountryCode,
+                  onCountryCodeChanged: (value) {
+                    setState(() {
+                      _selectedCountryCode = value!;
+                    });
                   },
                 ),
 
@@ -212,7 +207,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
-                            'إضافة الإعلان',
+                            'İlanı Ekle',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -316,12 +311,108 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
     );
   }
 
+  Widget _buildPhoneNumberField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required String selectedCountryCode,
+    required void Function(String?) onCountryCodeChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: AppConstants.smallPadding),
+        Row(
+          children: [
+            // Country Code Dropdown
+            Container(
+              width: 120,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: selectedCountryCode,
+                  isExpanded: true,
+                  items: AppConstants.countryCodes.map((country) {
+                    return DropdownMenuItem<String>(
+                      value: country['code'],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(country['flag']!),
+                          const SizedBox(width: 4),
+                          Text(
+                            country['code']!,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: onCountryCodeChanged,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Phone Number Input
+            Expanded(
+              child: TextFormField(
+                controller: controller,
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Lütfen telefon numarası girin';
+                  }
+                  if (value.length < 10) {
+                    return 'Telefon numarası en az 10 haneli olmalı';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  hintText: hint,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildHealthStatusSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'الحالة الصحية',
+          'Sağlık Durumu',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -332,7 +423,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
           children: [
             Expanded(
               child: CheckboxListTile(
-                title: const Text('مطعم'),
+                title: const Text('Aşılı'),
                 value: _isVaccinated,
                 onChanged: (value) {
                   setState(() {
@@ -345,7 +436,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
             ),
             Expanded(
               child: CheckboxListTile(
-                title: const Text('معقم'),
+                title: const Text('Kısırlaştırılmış'),
                 value: _isNeutered,
                 onChanged: (value) {
                   setState(() {
@@ -372,16 +463,47 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
     });
 
     try {
-      // محاكاة عملية الحفظ
-      await Future.delayed(const Duration(seconds: 2));
+      // Get current user
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        _showErrorSnackBar('Lütfen giriş yapın');
+        return;
+      }
+
+      // Create adoption pet object
+      final adoptionPet = AdoptionPet(
+        id: '', // Will be generated by database
+        name: _nameController.text.trim(),
+        type: _selectedType,
+        imageUrl:
+            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400', // Default image
+        description: _descriptionController.text.trim(),
+        city: _selectedCity,
+        contactNumber:
+            '$_selectedCountryCode${_contactNumberController.text.trim()}',
+        whatsappNumber:
+            '$_selectedCountryCode${_whatsappNumberController.text.trim()}',
+        age: int.parse(_ageController.text.trim()),
+        gender: _selectedGender,
+        isVaccinated: _isVaccinated,
+        isNeutered: _isNeutered,
+        createdAt: DateTime.now(),
+        userId: user.id,
+      );
+
+      // Insert into database
+      await Supabase.instance.client
+          .from(AppConstants.adoptionPetsTable)
+          .insert(adoptionPet.toJson())
+          .select();
 
       if (mounted) {
-        _showSuccessSnackBar('تم إضافة الإعلان بنجاح');
+        _showSuccessSnackBar('İlan başarıyla eklendi');
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('حدث خطأ أثناء حفظ الإعلان');
+        _showErrorSnackBar('İlan eklenirken hata oluştu: ${e.toString()}');
       }
     } finally {
       if (mounted) {

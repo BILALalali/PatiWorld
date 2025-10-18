@@ -488,7 +488,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _performLogout() async {
     try {
       _showSuccessSnackBar('Başarıyla çıkış yapıldı');
-      // TODO: Navigate to login screen
     } catch (e) {
       _showErrorSnackBar('Çıkış yapılırken hata oluştu');
     }
