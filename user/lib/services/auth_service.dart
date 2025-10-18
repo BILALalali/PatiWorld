@@ -150,9 +150,9 @@ class AuthService {
       if (phoneNumber != null) updates['phone_number'] = phoneNumber;
       if (countryCode != null) updates['country_code'] = countryCode;
       if (profileImageUrl != null) {
-        updates['profile_image'] = profileImageUrl;
+        updates['profile_image_url'] = profileImageUrl;
       } else if (clearProfileImage) {
-        updates['profile_image'] = null;
+        updates['profile_image_url'] = null;
       }
 
       // Önce kullanıcının mevcut olup olmadığını kontrol et

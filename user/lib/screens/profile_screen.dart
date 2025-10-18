@@ -21,9 +21,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _phoneController = TextEditingController();
 
   bool _isEditing = false;
+  bool _isLoading = false; // Loading state for image upload
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
   app_user.User? _currentUser; // Current user data
+  int _imageUpdateTimestamp = 0; // Track image updates to force refresh
 
   @override
   void initState() {
@@ -50,16 +52,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Then load user data
       final user = await AuthService.getCurrentUserWithProfile();
       if (user != null) {
-        setState(() {
-          _currentUser = user;
-          _nameController.text = user.fullName ?? '';
-          _emailController.text = user.email;
-          _phoneController.text = user.phoneNumber ?? '';
-        });
+        if (mounted) {
+          setState(() {
+            _currentUser = user;
+            _nameController.text = user.fullName ?? '';
+            _emailController.text = user.email;
+            _phoneController.text = user.phoneNumber ?? '';
+            _imageUpdateTimestamp =
+                DateTime.now().millisecondsSinceEpoch; // Force image refresh
+          });
+        }
       } else {
         // Fallback to basic user data if database fetch fails
         final user = AuthService.currentUser;
-        if (user != null) {
+        if (user != null && mounted) {
           setState(() {
             _nameController.text = user.fullName ?? '';
             _emailController.text = user.email;
@@ -71,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print('Error loading user data: $e');
       // Fallback to basic user data if database fetch fails
       final user = AuthService.currentUser;
-      if (user != null) {
+      if (user != null && mounted) {
         setState(() {
           _nameController.text = user.fullName ?? '';
           _emailController.text = user.email;
@@ -143,325 +149,687 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Stack(
           children: [
+            // Decorative background circles
             Container(
-              width: 120,
-              height: 120,
+              width: 140,
+              height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: 3,
+                gradient: RadialGradient(
+                  colors: [
+                    Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
+                    Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.05),
+                  ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: _selectedImage != null
-                    ? Image.file(
-                        _selectedImage!,
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                      )
-                    : _currentUser?.profileImageUrl != null
-                    ? Image.network(
-                        _currentUser!.profileImageUrl!,
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.primary.withValues(alpha: 0.1),
-                            child: Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          );
-                        },
-                      )
-                    : Container(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.1),
-                        child: Icon(
-                          Icons.person,
-                          size: 60,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
               ),
             ),
-            if (_isEditing) // Only show edit button when in editing mode
+            // Main profile image container
+            Positioned(
+              top: 10,
+              left: 10,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: _selectedImage != null
+                      ? Image.file(
+                          _selectedImage!,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        )
+                      : _currentUser?.profileImageUrl != null
+                      ? Image.network(
+                          '${_currentUser!.profileImageUrl!}?t=$_imageUpdateTimestamp',
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Theme.of(context).colorScheme.primary
+                                        .withValues(alpha: 0.1),
+                                    Theme.of(context).colorScheme.primary
+                                        .withValues(alpha: 0.05),
+                                  ],
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.pets,
+                                size: 50,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.6),
+                              ),
+                            );
+                          },
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.1),
+                                Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.05),
+                              ],
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.pets,
+                            size: 50,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.6),
+                          ),
+                        ),
+                ),
+              ),
+            ),
+            // Edit button with pet-themed icon
+            if (_isEditing)
               Positioned(
-                bottom: 0,
-                right: 0,
+                bottom: 5,
+                right: 5,
                 child: GestureDetector(
-                  onTap: _changeProfileImage,
+                  onTap: _isLoading ? null : _changeProfileImage,
                   child: Container(
-                    width: 36,
-                    height: 36,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: _isLoading
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.6)
+                          : Theme.of(context).colorScheme.primary,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.camera_alt,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                    child: _isLoading
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                        : const Icon(
+                            Icons.camera_alt_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                   ),
                 ),
               ),
           ],
         ),
-        const SizedBox(height: AppConstants.mediumPadding),
+        const SizedBox(height: 20),
+        // Name without emoji
         Text(
           _nameController.text.isNotEmpty ? _nameController.text : 'Kullanıcı',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
+            letterSpacing: 0.5,
           ),
         ),
-        Text(
-          'PatiWorld Üyesi',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            'PatiWorld Üyesi',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
       ],
     );
   }
 
   Widget _buildProfileInfoSection() {
-    return Card(
-      elevation: AppConstants.cardElevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.mediumPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hesap Bilgileri',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
+      child: Column(
+        children: [
+          // Header with pet theme
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.03),
+                ],
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
               ),
             ),
-            const SizedBox(height: AppConstants.mediumPadding),
-
-            // Full Name
-            _buildInfoField(
-              label: 'Ad Soyad',
-              controller: _nameController,
-              icon: Icons.person,
-              enabled: _isEditing,
-              validator: (value) {
-                if (_isEditing && (value == null || value.isEmpty)) {
-                  return 'Lütfen ad soyad giriniz';
-                }
-                return null;
-              },
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.15),
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.pets_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hesap Bilgileri',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).colorScheme.primary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Kişisel bilgilerinizi düzenleyin',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.7),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          ),
 
-            const SizedBox(height: AppConstants.mediumPadding),
+          // Content with better spacing
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                // Full Name
+                _buildPetThemedInfoField(
+                  label: 'Ad Soyad',
+                  controller: _nameController,
+                  icon: Icons.person_rounded,
+                  emoji: '👤',
+                  enabled: _isEditing,
+                  validator: (value) {
+                    if (_isEditing && (value == null || value.isEmpty)) {
+                      return 'Lütfen ad soyad giriniz';
+                    }
+                    return null;
+                  },
+                ),
 
-            // Email
-            _buildInfoField(
-              label: 'E-posta',
-              controller: _emailController,
-              icon: Icons.email,
-              enabled: false, // Email cannot be changed
-              keyboardType: TextInputType.emailAddress,
+                const SizedBox(height: 20),
+
+                // Email
+                _buildPetThemedInfoField(
+                  label: 'E-posta',
+                  controller: _emailController,
+                  icon: Icons.email_rounded,
+                  emoji: '📧',
+                  enabled: false, // Email cannot be changed
+                  keyboardType: TextInputType.emailAddress,
+                ),
+
+                const SizedBox(height: 20),
+
+                // Phone Number
+                _buildPetThemedInfoField(
+                  label: 'Telefon Numarası',
+                  controller: _phoneController,
+                  icon: Icons.phone_rounded,
+                  emoji: '📱',
+                  enabled: _isEditing,
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (_isEditing && (value == null || value.isEmpty)) {
+                      return 'Lütfen telefon numarası giriniz';
+                    }
+                    if (_isEditing && value != null && value.length < 10) {
+                      return 'Telefon numarası en az 10 haneli olmalıdır';
+                    }
+                    return null;
+                  },
+                ),
+              ],
             ),
-
-            const SizedBox(height: AppConstants.mediumPadding),
-
-            // Phone Number
-            _buildInfoField(
-              label: 'Telefon Numarası',
-              controller: _phoneController,
-              icon: Icons.phone,
-              enabled: _isEditing,
-              keyboardType: TextInputType.phone,
-              validator: (value) {
-                if (_isEditing && (value == null || value.isEmpty)) {
-                  return 'Lütfen telefon numarası giriniz';
-                }
-                if (_isEditing && value != null && value.length < 10) {
-                  return 'Telefon numarası en az 10 haneli olmalıdır';
-                }
-                return null;
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildInfoField({
+  Widget _buildPetThemedInfoField({
     required String label,
     required TextEditingController controller,
     required IconData icon,
+    required String emoji,
     required bool enabled,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        color: enabled ? Colors.white : Colors.grey[100],
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: enabled
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
+              : Colors.grey[400]!,
+          width: 2,
         ),
-        const SizedBox(height: AppConstants.smallPadding),
-        TextFormField(
-          controller: controller,
-          enabled: enabled,
-          keyboardType: keyboardType,
-          validator: validator,
-          decoration: InputDecoration(
-            prefixIcon: Icon(
-              icon,
-              color: Theme.of(context).colorScheme.primary,
+        boxShadow: enabled
+            ? [
+                BoxShadow(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            child: Row(
+              children: [
+                Text(emoji, style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: enabled
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey[600],
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          TextFormField(
+            controller: controller,
+            enabled: enabled,
+            keyboardType: keyboardType,
+            validator: validator,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w500,
+              color: enabled ? Colors.black87 : Colors.grey[600],
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-                width: 2,
+            decoration: InputDecoration(
+              prefixIcon: Container(
+                margin: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: enabled
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1)
+                      : Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: enabled
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.grey[500],
+                  size: 18,
+                ),
+              ),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+              hintStyle: TextStyle(
+                color: Colors.grey[400],
+                fontWeight: FontWeight.w400,
               ),
             ),
-            filled: true,
-            fillColor: enabled ? Colors.white : Colors.grey[100],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildStatisticsSection() {
-    return Card(
-      elevation: AppConstants.cardElevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.mediumPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'İstatistikleriniz',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
+      child: Column(
+        children: [
+          // Header with pet theme
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.03),
+                ],
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
               ),
             ),
-            const SizedBox(height: AppConstants.mediumPadding),
-            Row(
+            child: Row(
               children: [
-                Expanded(
-                  child: _buildStatCard(
-                    'Kayıp İlanları',
-                    '2',
-                    Icons.search,
-                    Colors.blue,
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.15),
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.analytics_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 24,
                   ),
                 ),
-                const SizedBox(width: AppConstants.mediumPadding),
+                const SizedBox(width: 16),
                 Expanded(
-                  child: _buildStatCard(
-                    'Sahiplendirme İlanları',
-                    '1',
-                    Icons.favorite,
-                    Colors.pink,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'İstatistikleriniz',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).colorScheme.primary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Aktivite özetiniz',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.7),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                Text('📊', style: TextStyle(fontSize: 24)),
+              ],
+            ),
+          ),
+
+          // Content with pet-themed stats
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildPetThemedStatCard(
+                        'Kayıp İlanları',
+                        '2',
+                        Icons.search_rounded,
+                        '🔍',
+                        Colors.blue,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildPetThemedStatCard(
+                        'Sahiplendirme İlanları',
+                        '1',
+                        Icons.favorite_rounded,
+                        '❤️',
+                        Colors.pink,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildPetThemedStatCard(
+                        'Kayıtlı Aşılar',
+                        '3',
+                        Icons.medical_services_rounded,
+                        '💉',
+                        Colors.green,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildPetThemedStatCard(
+                        'Uygulamada Gün',
+                        '15',
+                        Icons.calendar_today_rounded,
+                        '📅',
+                        Colors.orange,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: AppConstants.mediumPadding),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    'Kayıtlı Aşılar',
-                    '3',
-                    Icons.medical_services,
-                    Colors.green,
-                  ),
-                ),
-                const SizedBox(width: AppConstants.mediumPadding),
-                Expanded(
-                  child: _buildStatCard(
-                    'Uygulamada Gün',
-                    '15',
-                    Icons.calendar_today,
-                    Colors.orange,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildStatCard(
+  Widget _buildPetThemedStatCard(
     String title,
     String value,
     IconData icon,
+    String emoji,
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.all(AppConstants.mediumPadding),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 30),
-          const SizedBox(height: AppConstants.smallPadding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      color.withValues(alpha: 0.2),
+                      color.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: color, size: 20),
+              ),
+              Text(emoji, style: TextStyle(fontSize: 20)),
+            ],
+          ),
+          const SizedBox(height: 16),
           Text(
             value,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: color,
+              fontSize: 28,
             ),
           ),
+          const SizedBox(height: 8),
           Text(
             title,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w500,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: color.withValues(alpha: 0.8),
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -475,13 +843,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
           width: double.infinity,
           height: 50,
           child: ElevatedButton.icon(
-            onPressed: _isEditing ? _saveProfile : _toggleEdit,
-            icon: Icon(_isEditing ? Icons.save : Icons.edit),
+            onPressed: _isLoading
+                ? null
+                : (_isEditing ? _saveProfile : _toggleEdit),
+            icon: _isLoading
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Icon(_isEditing ? Icons.save : Icons.edit),
             label: Text(
-              _isEditing ? 'Değişiklikleri Kaydet' : 'Profili Düzenle',
+              _isLoading
+                  ? 'Yükleniyor...'
+                  : (_isEditing ? 'Değişiklikleri Kaydet' : 'Profili Düzenle'),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: _isLoading
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.6)
+                  : Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -521,6 +904,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final user = AuthService.currentUser;
       if (user != null) {
@@ -528,6 +915,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         // Upload image if selected
         if (_selectedImage != null) {
+          // Delete old profile image if exists
+          if (_currentUser?.profileImageUrl != null) {
+            await _deleteOldProfileImage(_currentUser!.profileImageUrl!);
+          }
+
           imageUrl = await _uploadProfileImage(user.id);
         }
 
@@ -545,13 +937,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           _isEditing = false;
           _selectedImage = null; // Clear selected image after saving
+          _isLoading = false;
         });
 
         _showSuccessSnackBar('Değişiklikler başarıyla kaydedildi');
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         _showErrorSnackBar('Kullanıcı bilgileri bulunamadı');
       }
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       _showErrorSnackBar(
         'Değişiklikler kaydedilirken hata oluştu: ${e.toString()}',
       );
@@ -662,6 +1061,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _removeProfileImage() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       setState(() {
         _selectedImage = null;
@@ -669,13 +1072,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       final user = AuthService.currentUser;
       if (user != null) {
+        // Delete old profile image from storage if exists
+        if (_currentUser?.profileImageUrl != null) {
+          await _deleteOldProfileImage(_currentUser!.profileImageUrl!);
+        }
+
         await AuthService.updateUserProfile(
           userId: user.id,
           clearProfileImage: true,
         );
+
+        // Reload user data to get updated profile
+        await _loadUserData();
+
+        setState(() {
+          _isLoading = false;
+        });
+
         _showSuccessSnackBar('Profil resmi kaldırıldı');
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
       }
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       _showErrorSnackBar('Resim kaldırılırken hata oluştu: ${e.toString()}');
     }
   }
@@ -685,71 +1108,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final fileBytes = await _selectedImage!.readAsBytes();
       final fileName = 'profile_$userId.jpg';
 
-      // First, try to create the bucket if it doesn't exist
-      try {
-        await Supabase.instance.client.storage.createBucket(
-          'profile-images',
-          BucketOptions(
-            public: true,
-            allowedMimeTypes: [
-              'image/jpeg',
-              'image/png',
-              'image/gif',
-              'image/webp',
-            ],
-            fileSizeLimit: '5242880', // 5MB
-          ),
-        );
-      } catch (createError) {
-        // Bucket might already exist, that's okay
-        print('Bucket creation result: $createError');
-      }
-
-      // Try to upload the image
-      try {
-        final response = await Supabase.instance.client.storage
-            .from('profile-images')
-            .uploadBinary(
-              fileName,
-              fileBytes,
-              fileOptions: FileOptions(
-                upsert: true, // Allow overwrite
-              ),
-            );
-
-        if (response.isNotEmpty) {
-          final imageUrl = Supabase.instance.client.storage
-              .from('profile-images')
-              .getPublicUrl(fileName);
-
-          return imageUrl;
-        } else {
-          throw Exception('Resim yüklenemedi');
-        }
-      } catch (uploadError) {
-        // If upload fails, try with a different approach
-        if (uploadError.toString().contains('permission denied') ||
-            uploadError.toString().contains('403') ||
-            uploadError.toString().contains('RLS') ||
-            uploadError.toString().contains('Bucket not found') ||
-            uploadError.toString().contains('404')) {
-          throw Exception(
-            'Storage bucket "profile-images" bulunamadı أو لا توجد صلاحيات. يرجى تشغيل SQL code في Supabase Dashboard:\n\n'
-            '1. اذهب إلى Supabase Dashboard\n'
-            '2. اختر SQL Editor\n'
-            '3. شغل الكود من ملف setup_storage_bucket.sql\n\n'
-            'Error: ${uploadError.toString()}',
+      // Upload the image to Supabase Storage
+      final response = await Supabase.instance.client.storage
+          .from(AppConstants.profileImagesBucket)
+          .uploadBinary(
+            fileName,
+            fileBytes,
+            fileOptions: FileOptions(
+              upsert: true, // Allow overwrite
+              contentType: 'image/jpeg',
+            ),
           );
-        }
-        throw uploadError;
+
+      if (response.isNotEmpty) {
+        // Get the public URL for the uploaded image
+        final imageUrl = Supabase.instance.client.storage
+            .from(AppConstants.profileImagesBucket)
+            .getPublicUrl(fileName);
+
+        return imageUrl;
+      } else {
+        throw Exception('Resim yüklenemedi');
       }
     } catch (e) {
-      if (e.toString().contains('file too large') ||
+      if (e.toString().contains('permission denied') ||
+          e.toString().contains('403') ||
+          e.toString().contains('RLS') ||
+          e.toString().contains('Bucket not found') ||
+          e.toString().contains('404')) {
+        throw Exception(
+          'Storage bucket "profile-images" bulunamadı أو لا توجد صلاحيات. يرجى تشغيل SQL code في Supabase Dashboard:\n\n'
+          '1. اذهب إلى Supabase Dashboard\n'
+          '2. اختر SQL Editor\n'
+          '3. شغل الكود من ملف setup_storage_bucket.sql\n\n'
+          'Error: ${e.toString()}',
+        );
+      } else if (e.toString().contains('file too large') ||
           e.toString().contains('413')) {
         throw Exception('الملف كبير جداً. يرجى اختيار صورة أصغر.');
       } else {
         throw Exception('خطأ في رفع الصورة: ${e.toString()}');
       }
+    }
+  }
+
+  Future<void> _deleteOldProfileImage(String imageUrl) async {
+    try {
+      // Extract file name from URL
+      final uri = Uri.parse(imageUrl);
+      final pathSegments = uri.pathSegments;
+      if (pathSegments.isNotEmpty) {
+        final fileName = pathSegments.last;
+
+        // Delete the file from storage
+        await Supabase.instance.client.storage
+            .from(AppConstants.profileImagesBucket)
+            .remove([fileName]);
+      }
+    } catch (e) {
+      // Log error but don't throw - this is not critical
+      print('Error deleting old profile image: $e');
     }
   }
 }

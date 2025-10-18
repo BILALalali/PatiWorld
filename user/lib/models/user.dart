@@ -27,11 +27,15 @@ class User {
       email: json['email'] ?? '',
       phoneNumber: json['phone_number'],
       countryCode: json['country_code'],
-      profileImageUrl: json['profile_image'],
+      profileImageUrl: json['profile_image_url'],
       fullName: json['full_name'],
       isEmailVerified: json['is_email_verified'] ?? false,
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(json['updated_at'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        json['created_at'] ?? DateTime.now().toIso8601String(),
+      ),
+      updatedAt: DateTime.parse(
+        json['updated_at'] ?? DateTime.now().toIso8601String(),
+      ),
     );
   }
 
@@ -41,7 +45,7 @@ class User {
       'email': email,
       'phone_number': phoneNumber,
       'country_code': countryCode,
-      'profile_image': profileImageUrl,
+      'profile_image_url': profileImageUrl,
       'full_name': fullName,
       'is_email_verified': isEmailVerified,
       'created_at': createdAt.toIso8601String(),
