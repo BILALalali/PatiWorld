@@ -18,6 +18,10 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Bu uygulama profil fotoğrafı çekmek için kameraya erişim gerektirir.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Bu uygulama profil fotoğrafı seçmek için fotoğraf galerisine erişim gerektirir.</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>

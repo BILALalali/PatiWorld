@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'screens/main_screen.dart';
+import 'screens/auth_wrapper.dart';
 import 'constants/app_constants.dart';
 
 void main() async {
@@ -30,7 +30,7 @@ class PatiWorldApp extends StatelessWidget {
         useMaterial3: true,
         appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
       ),
-      home: const MainScreen(),
+      home: const AuthWrapper(),
     );
   }
 }

@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:io';
 import '../constants/app_constants.dart';
+import '../services/auth_service.dart';
+import '../models/user.dart' as app_user;
+import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,11 +21,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _phoneController = TextEditingController();
 
   bool _isEditing = false;
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+  app_user.User? _currentUser; // Current user data
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadUserData();
+    });
   }
 
   @override
@@ -30,11 +41,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
-  void _loadUserData() {
-    // Kullanıcı için örnek veriler
-    _nameController.text = 'Ahmet Yılmaz';
-    _emailController.text = 'ahmet@example.com';
-    _phoneController.text = '0501234567';
+  Future<void> _loadUserData() async {
+    // Load user data from database
+    try {
+      // First, try to create profile for existing user if it doesn't exist
+      await AuthService.createProfileForExistingUser();
+
+      // Then load user data
+      final user = await AuthService.getCurrentUserWithProfile();
+      if (user != null) {
+        setState(() {
+          _currentUser = user;
+          _nameController.text = user.fullName ?? '';
+          _emailController.text = user.email;
+          _phoneController.text = user.phoneNumber ?? '';
+        });
+      } else {
+        // Fallback to basic user data if database fetch fails
+        final user = AuthService.currentUser;
+        if (user != null) {
+          setState(() {
+            _nameController.text = user.fullName ?? '';
+            _emailController.text = user.email;
+            _phoneController.text = user.phoneNumber ?? '';
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+      // Fallback to basic user data if database fetch fails
+      final user = AuthService.currentUser;
+      if (user != null) {
+        setState(() {
+          _nameController.text = user.fullName ?? '';
+          _emailController.text = user.email;
+          _phoneController.text = user.phoneNumber ?? '';
+        });
+      }
+    }
   }
 
   @override
@@ -117,34 +161,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               child: ClipOval(
-                child: Container(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.1),
-                  child: Icon(
-                    Icons.person,
-                    size: 60,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
+                child: _selectedImage != null
+                    ? Image.file(
+                        _selectedImage!,
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      )
+                    : _currentUser?.profileImageUrl != null
+                    ? Image.network(
+                        _currentUser!.profileImageUrl!,
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.1),
+                            child: Icon(
+                              Icons.person,
+                              size: 60,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
+                        child: Icon(
+                          Icons.person,
+                          size: 60,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
               ),
             ),
-            if (_isEditing)
+            if (_isEditing) // Only show edit button when in editing mode
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    color: Colors.white,
-                    size: 20,
+                child: GestureDetector(
+                  onTap: _changeProfileImage,
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
@@ -449,16 +522,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     try {
-      // محاكاة عملية الحفظ
-      await Future.delayed(const Duration(seconds: 2));
+      final user = AuthService.currentUser;
+      if (user != null) {
+        String? imageUrl;
 
-      setState(() {
-        _isEditing = false;
-      });
+        // Upload image if selected
+        if (_selectedImage != null) {
+          imageUrl = await _uploadProfileImage(user.id);
+        }
 
-      _showSuccessSnackBar('Değişiklikler başarıyla kaydedildi');
+        // Update user profile in database
+        await AuthService.updateUserProfile(
+          userId: user.id,
+          fullName: _nameController.text.trim(),
+          phoneNumber: _phoneController.text.trim(),
+          profileImageUrl: imageUrl,
+        );
+
+        // Reload user data to get updated profile
+        await _loadUserData();
+
+        setState(() {
+          _isEditing = false;
+          _selectedImage = null; // Clear selected image after saving
+        });
+
+        _showSuccessSnackBar('Değişiklikler başarıyla kaydedildi');
+      } else {
+        _showErrorSnackBar('Kullanıcı bilgileri bulunamadı');
+      }
     } catch (e) {
-      _showErrorSnackBar('Değişiklikler kaydedilirken hata oluştu');
+      _showErrorSnackBar(
+        'Değişiklikler kaydedilirken hata oluştu: ${e.toString()}',
+      );
     }
   }
 
@@ -487,9 +583,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _performLogout() async {
     try {
-      _showSuccessSnackBar('Başarıyla çıkış yapıldı');
+      await AuthService.signOut();
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
+      }
     } catch (e) {
-      _showErrorSnackBar('Çıkış yapılırken hata oluştu');
+      _showErrorSnackBar('Çıkış yapılırken hata oluştu: ${e.toString()}');
     }
   }
 
@@ -503,5 +605,151 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.green),
     );
+  }
+
+  Future<void> _changeProfileImage() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Galeriden Seç'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImageFromGallery();
+                },
+              ),
+              if (_currentUser?.profileImageUrl != null ||
+                  _selectedImage != null)
+                ListTile(
+                  leading: const Icon(Icons.delete),
+                  title: const Text('Resmi Kaldır'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _removeProfileImage();
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 400,
+        maxHeight: 400,
+        imageQuality: 80,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+        });
+        _showSuccessSnackBar('Resim seçildi');
+      }
+    } catch (e) {
+      _showErrorSnackBar(
+        'Galeriden resim seçilirken hata oluştu: ${e.toString()}',
+      );
+    }
+  }
+
+  Future<void> _removeProfileImage() async {
+    try {
+      setState(() {
+        _selectedImage = null;
+      });
+
+      final user = AuthService.currentUser;
+      if (user != null) {
+        await AuthService.updateUserProfile(
+          userId: user.id,
+          clearProfileImage: true,
+        );
+        _showSuccessSnackBar('Profil resmi kaldırıldı');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Resim kaldırılırken hata oluştu: ${e.toString()}');
+    }
+  }
+
+  Future<String> _uploadProfileImage(String userId) async {
+    try {
+      final fileBytes = await _selectedImage!.readAsBytes();
+      final fileName = 'profile_$userId.jpg';
+
+      // First, try to create the bucket if it doesn't exist
+      try {
+        await Supabase.instance.client.storage.createBucket(
+          'profile-images',
+          BucketOptions(
+            public: true,
+            allowedMimeTypes: [
+              'image/jpeg',
+              'image/png',
+              'image/gif',
+              'image/webp',
+            ],
+            fileSizeLimit: '5242880', // 5MB
+          ),
+        );
+      } catch (createError) {
+        // Bucket might already exist, that's okay
+        print('Bucket creation result: $createError');
+      }
+
+      // Try to upload the image
+      try {
+        final response = await Supabase.instance.client.storage
+            .from('profile-images')
+            .uploadBinary(
+              fileName,
+              fileBytes,
+              fileOptions: FileOptions(
+                upsert: true, // Allow overwrite
+              ),
+            );
+
+        if (response.isNotEmpty) {
+          final imageUrl = Supabase.instance.client.storage
+              .from('profile-images')
+              .getPublicUrl(fileName);
+
+          return imageUrl;
+        } else {
+          throw Exception('Resim yüklenemedi');
+        }
+      } catch (uploadError) {
+        // If upload fails, try with a different approach
+        if (uploadError.toString().contains('permission denied') ||
+            uploadError.toString().contains('403') ||
+            uploadError.toString().contains('RLS') ||
+            uploadError.toString().contains('Bucket not found') ||
+            uploadError.toString().contains('404')) {
+          throw Exception(
+            'Storage bucket "profile-images" bulunamadı أو لا توجد صلاحيات. يرجى تشغيل SQL code في Supabase Dashboard:\n\n'
+            '1. اذهب إلى Supabase Dashboard\n'
+            '2. اختر SQL Editor\n'
+            '3. شغل الكود من ملف setup_storage_bucket.sql\n\n'
+            'Error: ${uploadError.toString()}',
+          );
+        }
+        throw uploadError;
+      }
+    } catch (e) {
+      if (e.toString().contains('file too large') ||
+          e.toString().contains('413')) {
+        throw Exception('الملف كبير جداً. يرجى اختيار صورة أصغر.');
+      } else {
+        throw Exception('خطأ في رفع الصورة: ${e.toString()}');
+      }
+    }
   }
 }
