@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
+import '../models/vaccination.dart';
 
 class AddVaccinationScreen extends StatefulWidget {
-  const AddVaccinationScreen({super.key});
+  final Vaccination? vaccinationToEdit;
+
+  const AddVaccinationScreen({super.key, this.vaccinationToEdit});
 
   @override
   State<AddVaccinationScreen> createState() => _AddVaccinationScreenState();
@@ -16,8 +19,28 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
   String _selectedPetType = AppConstants.petTypes.first;
   String _selectedVaccineType = AppConstants.vaccineTypes.first;
   DateTime _vaccineDate = DateTime.now();
+  DateTime _nextVaccineDate = DateTime.now().add(const Duration(days: 30));
   int _vaccineNumber = 1;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeForm();
+  }
+
+  void _initializeForm() {
+    if (widget.vaccinationToEdit != null) {
+      final vaccination = widget.vaccinationToEdit!;
+      _petNameController.text = vaccination.petName;
+      _selectedPetType = vaccination.petType;
+      _selectedVaccineType = vaccination.vaccineName;
+      _vaccineDate = vaccination.vaccineDate;
+      _nextVaccineDate = vaccination.nextVaccineDate;
+      _vaccineNumber = vaccination.vaccineNumber;
+      _notesController.text = vaccination.notes;
+    }
+  }
 
   @override
   void dispose() {
@@ -30,7 +53,9 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('إضافة لقاح'),
+        title: Text(
+          widget.vaccinationToEdit != null ? 'Aşı Düzenle' : 'Aşı Ekle',
+        ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -56,11 +81,11 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
                 // Pet Name
                 _buildTextField(
                   controller: _petNameController,
-                  label: 'اسم الحيوان',
-                  hint: 'أدخل اسم الحيوان',
+                  label: 'Hayvan Adı',
+                  hint: 'Hayvan adını girin',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال اسم الحيوان';
+                      return 'Lütfen hayvan adını girin';
                     }
                     return null;
                   },
@@ -70,7 +95,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
 
                 // Pet Type
                 _buildDropdown(
-                  label: 'نوع الحيوان',
+                  label: 'Hayvan Türü',
                   value: _selectedPetType,
                   items: AppConstants.petTypes,
                   onChanged: (value) {
@@ -84,7 +109,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
 
                 // Vaccine Type
                 _buildDropdown(
-                  label: 'نوع اللقاح',
+                  label: 'Aşı Türü',
                   value: _selectedVaccineType,
                   items: AppConstants.vaccineTypes,
                   onChanged: (value) {
@@ -106,11 +131,16 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
 
                 const SizedBox(height: AppConstants.mediumPadding),
 
+                // Next Vaccine Date
+                _buildNextVaccineDateField(),
+
+                const SizedBox(height: AppConstants.mediumPadding),
+
                 // Notes
                 _buildTextField(
                   controller: _notesController,
-                  label: 'ملاحظات (اختياري)',
-                  hint: 'أدخل أي ملاحظات إضافية',
+                  label: 'Notlar (İsteğe Bağlı)',
+                  hint: 'Ek notlar girin',
                   maxLines: 3,
                 ),
 
@@ -136,9 +166,11 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'إضافة اللقاح',
-                            style: TextStyle(
+                        : Text(
+                            widget.vaccinationToEdit != null
+                                ? 'Aşı Güncelle'
+                                : 'Aşı Ekle',
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -244,7 +276,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'تاريخ اللقاح',
+          'Aşı Tarihi',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -284,7 +316,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'رقم اللقاح',
+          'Aşı Numarası',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -348,13 +380,47 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
     );
   }
 
-  Widget _buildNextVaccineInfo() {
-    final nextVaccineDate = DateTime(
-      _vaccineDate.year,
-      _vaccineDate.month + 1, // بعد شهر
-      _vaccineDate.day,
+  Widget _buildNextVaccineDateField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Sonraki Aşı Tarihi',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: AppConstants.smallPadding),
+        GestureDetector(
+          onTap: _selectNextVaccineDate,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.schedule,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '${_nextVaccineDate.day}/${_nextVaccineDate.month}/${_nextVaccineDate.year}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
+  }
 
+  Widget _buildNextVaccineInfo() {
     return Container(
       padding: const EdgeInsets.all(AppConstants.mediumPadding),
       decoration: BoxDecoration(
@@ -370,7 +436,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
               Icon(Icons.schedule, color: Colors.blue[700], size: 20),
               const SizedBox(width: 8),
               Text(
-                'معلومات اللقاح التالي',
+                'Sonraki Aşı Bilgileri',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.blue[700],
@@ -380,14 +446,14 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'سيتم تذكيرك باللقاح التالي في:',
+            'Sonraki aşı için hatırlatma tarihi:',
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.blue[600]),
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            '${nextVaccineDate.day}/${nextVaccineDate.month}/${nextVaccineDate.year}',
+            '${_nextVaccineDate.day}/${_nextVaccineDate.month}/${_nextVaccineDate.year}',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               color: Colors.blue[700],
@@ -395,7 +461,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'رقم اللقاح التالي: ${_vaccineNumber + 1}',
+            'Sonraki aşı numarası: ${_vaccineNumber + 1}',
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.blue[600]),
@@ -419,6 +485,20 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
     }
   }
 
+  Future<void> _selectNextVaccineDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _nextVaccineDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+    );
+    if (picked != null && picked != _nextVaccineDate) {
+      setState(() {
+        _nextVaccineDate = picked;
+      });
+    }
+  }
+
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -429,16 +509,20 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
     });
 
     try {
-      // محاكاة عملية الحفظ
+      // Kaydetme işlemini simüle et
       await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
-        _showSuccessSnackBar('تم إضافة اللقاح بنجاح');
+        _showSuccessSnackBar(
+          widget.vaccinationToEdit != null
+              ? 'Aşı başarıyla güncellendi'
+              : 'Aşı başarıyla eklendi',
+        );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('حدث خطأ أثناء حفظ اللقاح');
+        _showErrorSnackBar('Aşı kaydedilirken hata oluştu');
       }
     } finally {
       if (mounted) {

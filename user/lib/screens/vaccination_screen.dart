@@ -21,7 +21,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   }
 
   Future<void> _loadVaccinations() async {
-    // بيانات تجريبية للقاحات
+    // Test verileri aşılar için
     setState(() {
       vaccinations = [
         Vaccination(
@@ -108,14 +108,14 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
           ),
           const SizedBox(height: AppConstants.mediumPadding),
           Text(
-            'لا توجد لقاحات مسجلة',
+            'Kayıtlı aşı bulunmuyor',
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'أضف لقاحات حيواناتك الأليفة لتتبع مواعيدها',
+            'Evcil hayvanlarınızın aşı takibini yapmak için aşı ekleyin',
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
@@ -213,10 +213,10 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                     ),
                     child: Text(
                       isOverdue
-                          ? 'انتهى الموعد'
+                          ? 'Süresi Doldu'
                           : daysUntilNext <= 7
-                          ? 'قريباً'
-                          : 'مجدول',
+                          ? 'Yakında'
+                          : 'Planlandı',
                       style: TextStyle(
                         color: isOverdue
                             ? Colors.red[700]
@@ -251,7 +251,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                     ),
                   ),
                   Text(
-                    'لقاح #${vaccination.vaccineNumber}',
+                    'Aşı #${vaccination.vaccineNumber}',
                     style: Theme.of(
                       context,
                     ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
@@ -266,7 +266,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                 children: [
                   Expanded(
                     child: _buildDateInfo(
-                      'تاريخ اللقاح',
+                      'Aşı Tarihi',
                       vaccination.vaccineDate,
                       Icons.event,
                       Colors.blue,
@@ -275,7 +275,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                   const SizedBox(width: AppConstants.mediumPadding),
                   Expanded(
                     child: _buildDateInfo(
-                      'اللقاح التالي',
+                      'Sonraki Aşı',
                       vaccination.nextVaccineDate,
                       Icons.schedule,
                       isOverdue ? Colors.red : Colors.green,
@@ -314,7 +314,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _editVaccination(vaccination),
                       icon: const Icon(Icons.edit, size: 18),
-                      label: const Text('تعديل'),
+                      label: const Text('Düzenle'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
@@ -329,7 +329,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _deleteVaccination(vaccination),
                       icon: const Icon(Icons.delete, size: 18),
-                      label: const Text('حذف'),
+                      label: const Text('Sil'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
@@ -386,26 +386,34 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   }
 
   void _editVaccination(Vaccination vaccination) {
-    _showInfoSnackBar('ميزة التعديل قيد التطوير');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            AddVaccinationScreen(vaccinationToEdit: vaccination),
+      ),
+    ).then((_) => _loadVaccinations());
   }
 
   void _deleteVaccination(Vaccination vaccination) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تأكيد الحذف'),
-        content: Text('هل أنت متأكد من حذف لقاح ${vaccination.petName}؟'),
+        title: const Text('Silme Onayı'),
+        content: Text(
+          '${vaccination.petName} aşısını silmek istediğinizden emin misiniz?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: const Text('İptal'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _performDelete(vaccination);
             },
-            child: const Text('حذف', style: TextStyle(color: Colors.red)),
+            child: const Text('Sil', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -418,16 +426,10 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
         vaccinations.removeWhere((v) => v.id == vaccination.id);
       });
 
-      _showSuccessSnackBar('تم حذف اللقاح بنجاح');
+      _showSuccessSnackBar('Aşı başarıyla silindi');
     } catch (e) {
-      _showErrorSnackBar('حدث خطأ أثناء حذف اللقاح');
+      _showErrorSnackBar('Aşı silinirken hata oluştu');
     }
-  }
-
-  void _showInfoSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.blue),
-    );
   }
 
   void _showErrorSnackBar(String message) {

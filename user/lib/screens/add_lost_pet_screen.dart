@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/app_constants.dart';
+import '../models/lost_pet.dart';
 
 class AddLostPetScreen extends StatefulWidget {
   const AddLostPetScreen({super.key});
@@ -14,10 +16,16 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
   final _descriptionController = TextEditingController();
   final _contactNumberController = TextEditingController();
   final _whatsappNumberController = TextEditingController();
+  final _ageController = TextEditingController();
 
   String _selectedType = AppConstants.petTypes.first;
   String _selectedCity = AppConstants.cities.first;
-  DateTime _lostDate = DateTime.now();
+  String _selectedGender = AppConstants.genderOptions.first;
+  String _selectedContactCountryCode = '+90'; // Default to Turkey
+  String _selectedWhatsAppCountryCode = '+90'; // Default to Turkey
+  DateTime _selectedLostDate = DateTime.now();
+  bool _isVaccinated = false;
+  bool _isNeutered = false;
   bool _isLoading = false;
 
   @override
@@ -26,6 +34,7 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
     _descriptionController.dispose();
     _contactNumberController.dispose();
     _whatsappNumberController.dispose();
+    _ageController.dispose();
     super.dispose();
   }
 
@@ -33,7 +42,7 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('إضافة إعلان مفقود'),
+        title: const Text('Kayıp Hayvan İlanı Ekle'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -59,11 +68,11 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
                 // Pet Name
                 _buildTextField(
                   controller: _nameController,
-                  label: 'اسم الحيوان',
-                  hint: 'أدخل اسم الحيوان',
+                  label: 'Hayvan Adı',
+                  hint: 'Hayvanın adını girin',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال اسم الحيوان';
+                      return 'Lütfen hayvan adını girin';
                     }
                     return null;
                   },
@@ -73,7 +82,7 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
 
                 // Pet Type
                 _buildDropdown(
-                  label: 'نوع الحيوان',
+                  label: 'Hayvan Türü',
                   value: _selectedType,
                   items: AppConstants.petTypes,
                   onChanged: (value) {
@@ -88,12 +97,13 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
                 // Description
                 _buildTextField(
                   controller: _descriptionController,
-                  label: 'وصف الحيوان',
-                  hint: 'صف الحيوان بالتفصيل (اللون، الحجم، المميزات...)',
+                  label: 'Hayvan Açıklaması',
+                  hint:
+                      'Hayvanı detaylı olarak açıklayın (renk, boyut, özellikler, davranış...)',
                   maxLines: 3,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال وصف الحيوان';
+                      return 'Lütfen hayvan açıklaması girin';
                     }
                     return null;
                   },
@@ -103,7 +113,7 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
 
                 // City
                 _buildDropdown(
-                  label: 'المدينة',
+                  label: 'Şehir',
                   value: _selectedCity,
                   items: AppConstants.cities,
                   onChanged: (value) {
@@ -116,22 +126,29 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
                 const SizedBox(height: AppConstants.mediumPadding),
 
                 // Lost Date
-                _buildDateField(),
+                _buildDateField(
+                  label: 'Kayıp Tarihi',
+                  selectedDate: _selectedLostDate,
+                  onDateSelected: (date) {
+                    setState(() {
+                      _selectedLostDate = date;
+                    });
+                  },
+                ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
 
-                // Contact Number
+                // Age
                 _buildTextField(
-                  controller: _contactNumberController,
-                  label: 'رقم الهاتف',
-                  hint: '05xxxxxxxx',
-                  keyboardType: TextInputType.phone,
+                  controller: _ageController,
+                  label: 'Yaş (Ay)',
+                  hint: 'Yaşını ay olarak girin (opsiyonel)',
+                  keyboardType: TextInputType.number,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال رقم الهاتف';
-                    }
-                    if (value.length < 10) {
-                      return 'رقم الهاتف يجب أن يكون 10 أرقام على الأقل';
+                    if (value != null && value.isNotEmpty) {
+                      if (int.tryParse(value) == null) {
+                        return 'Lütfen geçerli bir sayı girin';
+                      }
                     }
                     return null;
                   },
@@ -139,20 +156,50 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
 
                 const SizedBox(height: AppConstants.mediumPadding),
 
+                // Gender
+                _buildDropdown(
+                  label: 'Cinsiyet',
+                  value: _selectedGender,
+                  items: AppConstants.genderOptions,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedGender = value!;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: AppConstants.mediumPadding),
+
+                // Health Status
+                _buildHealthStatusSection(),
+
+                const SizedBox(height: AppConstants.mediumPadding),
+
+                // Contact Number
+                _buildPhoneNumberField(
+                  controller: _contactNumberController,
+                  label: 'Telefon Numarası',
+                  hint: '5xxxxxxxx',
+                  selectedCountryCode: _selectedContactCountryCode,
+                  onCountryCodeChanged: (value) {
+                    setState(() {
+                      _selectedContactCountryCode = value!;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: AppConstants.mediumPadding),
+
                 // WhatsApp Number
-                _buildTextField(
+                _buildPhoneNumberField(
                   controller: _whatsappNumberController,
-                  label: 'رقم الواتساب',
-                  hint: '05xxxxxxxx',
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'يرجى إدخال رقم الواتساب';
-                    }
-                    if (value.length < 10) {
-                      return 'رقم الواتساب يجب أن يكون 10 أرقام على الأقل';
-                    }
-                    return null;
+                  label: 'WhatsApp Numarası',
+                  hint: '5xxxxxxxx',
+                  selectedCountryCode: _selectedWhatsAppCountryCode,
+                  onCountryCodeChanged: (value) {
+                    setState(() {
+                      _selectedWhatsAppCountryCode = value!;
+                    });
                   },
                 ),
 
@@ -174,7 +221,7 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
-                            'إضافة الإعلان',
+                            'İlanı Ekle',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -278,22 +325,36 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
     );
   }
 
-  Widget _buildDateField() {
+  Widget _buildDateField({
+    required String label,
+    required DateTime selectedDate,
+    required void Function(DateTime) onDateSelected,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'تاريخ الفقد',
+          label,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
         const SizedBox(height: AppConstants.smallPadding),
-        GestureDetector(
-          onTap: _selectDate,
+        InkWell(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: selectedDate,
+              firstDate: DateTime(2020),
+              lastDate: DateTime.now(),
+            );
+            if (date != null) {
+              onDateSelected(date);
+            }
+          },
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -307,7 +368,7 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  '${_lostDate.day}/${_lostDate.month}/${_lostDate.year}',
+                  '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}',
                   style: const TextStyle(fontSize: 16),
                 ),
               ],
@@ -318,18 +379,146 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
     );
   }
 
-  Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _lostDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
+  Widget _buildPhoneNumberField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required String selectedCountryCode,
+    required void Function(String?) onCountryCodeChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: AppConstants.smallPadding),
+        Row(
+          children: [
+            // Country Code Dropdown
+            Container(
+              width: 120,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: selectedCountryCode,
+                  isExpanded: true,
+                  items: AppConstants.countryCodes.map((country) {
+                    return DropdownMenuItem<String>(
+                      value: country['code'],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(country['flag']!),
+                          const SizedBox(width: 4),
+                          Text(
+                            country['code']!,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: onCountryCodeChanged,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Phone Number Input
+            Expanded(
+              child: TextFormField(
+                controller: controller,
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Lütfen telefon numarası girin';
+                  }
+                  if (value.length < 10) {
+                    return 'Telefon numarası en az 10 haneli olmalı';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  hintText: hint,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
-    if (picked != null && picked != _lostDate) {
-      setState(() {
-        _lostDate = picked;
-      });
-    }
+  }
+
+  Widget _buildHealthStatusSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Sağlık Durumu',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: AppConstants.smallPadding),
+        Row(
+          children: [
+            Expanded(
+              child: CheckboxListTile(
+                title: const Text('Aşılı'),
+                value: _isVaccinated,
+                onChanged: (value) {
+                  setState(() {
+                    _isVaccinated = value ?? false;
+                  });
+                },
+                activeColor: Theme.of(context).colorScheme.primary,
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ),
+            Expanded(
+              child: CheckboxListTile(
+                title: const Text('Kısırlaştırılmış'),
+                value: _isNeutered,
+                onChanged: (value) {
+                  setState(() {
+                    _isNeutered = value ?? false;
+                  });
+                },
+                activeColor: Theme.of(context).colorScheme.primary,
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Future<void> _submitForm() async {
@@ -342,16 +531,52 @@ class _AddLostPetScreenState extends State<AddLostPetScreen> {
     });
 
     try {
-      // محاكاة عملية الحفظ
-      await Future.delayed(const Duration(seconds: 2));
+      // Get current user
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        _showErrorSnackBar('Lütfen giriş yapın');
+        return;
+      }
+
+      // Create lost pet object
+      final lostPet = LostPet(
+        id: '', // Will be generated by database
+        name: _nameController.text.trim(),
+        type: _selectedType,
+        description: _descriptionController.text.trim(),
+        city: _selectedCity,
+        lostDate: _selectedLostDate,
+        contactNumber:
+            '$_selectedContactCountryCode${_contactNumberController.text.trim()}',
+        whatsappNumber:
+            '$_selectedWhatsAppCountryCode${_whatsappNumberController.text.trim()}',
+        imageUrl:
+            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400', // Default image
+        ageMonths: _ageController.text.isNotEmpty
+            ? int.parse(_ageController.text.trim())
+            : null,
+        gender: _selectedGender,
+        isVaccinated: _isVaccinated,
+        isNeutered: _isNeutered,
+        isActive: true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        userId: user.id,
+      );
+
+      // Insert into database
+      await Supabase.instance.client
+          .from(AppConstants.lostPetsTable)
+          .insert(lostPet.toJson())
+          .select();
 
       if (mounted) {
-        _showSuccessSnackBar('تم إضافة الإعلان بنجاح');
+        _showSuccessSnackBar('İlan başarıyla eklendi');
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('حدث خطأ أثناء حفظ الإعلان');
+        _showErrorSnackBar('İlan eklenirken hata oluştu: ${e.toString()}');
       }
     } finally {
       if (mounted) {

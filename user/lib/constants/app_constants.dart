@@ -156,11 +156,11 @@ class AppConstants {
 
   // Vaccine Types
   static const List<String> vaccineTypes = [
-    'لقاح أساسي',
-    'لقاح سنوي',
-    'لقاح ضد داء الكلب',
-    'لقاح ضد السعال',
-    'لقاح ضد الإنفلونزا',
-    'أخرى',
+    'Temel Aşı',
+    'Yıllık Aşı',
+    'Kuduz Aşısı',
+    'Öksürük Aşısı',
+    'Grip Aşısı',
+    'Diğer',
   ];
 }
