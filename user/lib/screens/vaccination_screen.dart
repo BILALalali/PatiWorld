@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/vaccination.dart';
 import '../constants/app_constants.dart';
+import '../services/vaccination_service.dart';
 import 'add_vaccination_screen.dart';
+import 'vaccination_stats_screen.dart';
 
 class VaccinationScreen extends StatefulWidget {
   const VaccinationScreen({super.key});
@@ -21,50 +23,24 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   }
 
   Future<void> _loadVaccinations() async {
-    // Test verileri aşılar için
-    setState(() {
-      vaccinations = [
-        Vaccination(
-          id: '1',
-          petName: 'Küçük Kedi',
-          petType: 'Kedi',
-          vaccineName: 'Temel Aşı',
-          vaccineDate: DateTime.now().subtract(const Duration(days: 20)),
-          nextVaccineDate: DateTime.now().add(const Duration(days: 10)),
-          vaccineNumber: 1,
-          notes: 'Küçük kediler için temel aşı',
-          createdAt: DateTime.now().subtract(const Duration(days: 20)),
-          userId: 'user1',
-        ),
-        Vaccination(
-          id: '2',
-          petName: 'Labrador Köpek',
-          petType: 'Köpek',
-          vaccineName: 'Kuduz Aşısı',
-          vaccineDate: DateTime.now().subtract(const Duration(days: 5)),
-          nextVaccineDate: DateTime.now().add(const Duration(days: 25)),
-          vaccineNumber: 2,
-          notes: 'Yıllık kuduz aşısı',
-          createdAt: DateTime.now().subtract(const Duration(days: 5)),
-          userId: 'user1',
-        ),
-        Vaccination(
-          id: '3',
-          petName: 'Büyük Kedi',
-          petType: 'Kedi',
-          vaccineName: 'Yıllık Aşı',
-          vaccineDate: DateTime.now().subtract(const Duration(days: 30)),
-          nextVaccineDate: DateTime.now().add(
-            const Duration(days: 0),
-          ), // süresi doldu
-          vaccineNumber: 3,
-          notes: 'Kapsamlı yıllık aşı',
-          createdAt: DateTime.now().subtract(const Duration(days: 30)),
-          userId: 'user1',
-        ),
-      ];
-      isLoading = false;
-    });
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final fetchedVaccinations =
+          await VaccinationService.getUserVaccinations();
+
+      setState(() {
+        vaccinations = fetchedVaccinations;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      _showErrorSnackBar('لقاحات جلب فشل في: $e');
+    }
   }
 
   @override
@@ -75,6 +51,20 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const VaccinationStatsScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.analytics),
+            tooltip: 'إحصائيات اللقاحات',
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -82,13 +72,18 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
           ? _buildEmptyState()
           : _buildVaccinationsList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const AddVaccinationScreen(),
             ),
-          ).then((_) => _loadVaccinations());
+          );
+
+          // تحديث القائمة إذا تم إضافة أو تعديل لقاح
+          if (result == true) {
+            _loadVaccinations();
+          }
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
         child: const Icon(Icons.add, color: Colors.white),
@@ -385,14 +380,19 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
     );
   }
 
-  void _editVaccination(Vaccination vaccination) {
-    Navigator.push(
+  void _editVaccination(Vaccination vaccination) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
             AddVaccinationScreen(vaccinationToEdit: vaccination),
       ),
-    ).then((_) => _loadVaccinations());
+    );
+
+    // تحديث القائمة إذا تم تعديل اللقاح
+    if (result == true) {
+      _loadVaccinations();
+    }
   }
 
   void _deleteVaccination(Vaccination vaccination) {
@@ -422,13 +422,15 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
 
   Future<void> _performDelete(Vaccination vaccination) async {
     try {
+      await VaccinationService.deleteVaccination(vaccination.id);
+
       setState(() {
         vaccinations.removeWhere((v) => v.id == vaccination.id);
       });
 
-      _showSuccessSnackBar('Aşı başarıyla silindi');
+      _showSuccessSnackBar('تم حذف اللقاح بنجاح');
     } catch (e) {
-      _showErrorSnackBar('Aşı silinirken hata oluştu');
+      _showErrorSnackBar('فشل في حذف اللقاح: $e');
     }
   }
 

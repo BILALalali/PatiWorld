@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
 import '../models/vaccination.dart';
+import '../services/vaccination_service.dart';
 
 class AddVaccinationScreen extends StatefulWidget {
   final Vaccination? vaccinationToEdit;
@@ -36,7 +37,10 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
       _selectedPetType = vaccination.petType;
       _selectedVaccineType = vaccination.vaccineName;
       _vaccineDate = vaccination.vaccineDate;
-      _nextVaccineDate = vaccination.nextVaccineDate;
+      // التأكد من أن تاريخ اللقاح التالي ليس في الماضي
+      _nextVaccineDate = vaccination.nextVaccineDate.isBefore(DateTime.now())
+          ? DateTime.now().add(const Duration(days: 30))
+          : vaccination.nextVaccineDate;
       _vaccineNumber = vaccination.vaccineNumber;
       _notesController.text = vaccination.notes;
     }
@@ -486,9 +490,14 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
   }
 
   Future<void> _selectNextVaccineDate() async {
+    // التأكد من أن التاريخ الافتراضي ليس في الماضي
+    final initialDate = _nextVaccineDate.isBefore(DateTime.now())
+        ? DateTime.now().add(const Duration(days: 30))
+        : _nextVaccineDate;
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _nextVaccineDate,
+      initialDate: initialDate,
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
     );
@@ -509,20 +518,38 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
     });
 
     try {
-      // Kaydetme işlemini simüle et
-      await Future.delayed(const Duration(seconds: 2));
+      // استخدام معرف وهمي للاختبار
+      const testUserId = '00000000-0000-0000-0000-000000000001';
+
+      final vaccination = Vaccination(
+        id: widget.vaccinationToEdit?.id ?? '',
+        petName: _petNameController.text.trim(),
+        petType: _selectedPetType,
+        vaccineName: _selectedVaccineType,
+        vaccineDate: _vaccineDate,
+        nextVaccineDate: _nextVaccineDate,
+        vaccineNumber: _vaccineNumber,
+        notes: _notesController.text.trim(),
+        createdAt: widget.vaccinationToEdit?.createdAt ?? DateTime.now(),
+        userId: testUserId,
+      );
+
+      if (widget.vaccinationToEdit != null) {
+        // تحديث لقاح موجود
+        await VaccinationService.updateVaccination(vaccination);
+        _showSuccessSnackBar('تم تحديث اللقاح بنجاح');
+      } else {
+        // إضافة لقاح جديد
+        await VaccinationService.addVaccination(vaccination);
+        _showSuccessSnackBar('تم إضافة اللقاح بنجاح');
+      }
 
       if (mounted) {
-        _showSuccessSnackBar(
-          widget.vaccinationToEdit != null
-              ? 'Aşı başarıyla güncellendi'
-              : 'Aşı başarıyla eklendi',
-        );
-        Navigator.pop(context);
+        Navigator.pop(context, true); // إرجاع true للإشارة إلى نجاح العملية
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('Aşı kaydedilirken hata oluştu');
+        _showErrorSnackBar('فشل في حفظ اللقاح: $e');
       }
     } finally {
       if (mounted) {
