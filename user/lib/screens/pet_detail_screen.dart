@@ -84,7 +84,7 @@ class PetDetailScreen extends StatelessWidget {
                   // Description
                   _buildSection(
                     context,
-                    'الوصف',
+                    'Açıklama',
                     pet.description,
                     Icons.description,
                   ),
@@ -94,7 +94,7 @@ class PetDetailScreen extends StatelessWidget {
                   // Care Instructions
                   _buildSection(
                     context,
-                    'طريقة العناية',
+                    'Bakım Yöntemi',
                     pet.careInstructions,
                     Icons.healing,
                   ),
@@ -177,7 +177,7 @@ class PetDetailScreen extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'أهم الصفات',
+              'Önemli Özellikler',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
@@ -230,7 +230,7 @@ class PetDetailScreen extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'الأطعمة المفضلة',
+              'Favori Yemekler',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
@@ -277,7 +277,7 @@ class PetDetailScreen extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'الأمراض الشائعة',
+              'Yaygın Hastalıklar',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,

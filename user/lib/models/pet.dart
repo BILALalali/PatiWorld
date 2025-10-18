@@ -8,7 +8,9 @@ class Pet {
   final List<String> foods; // الأطعمة المفضلة
   final List<String> diseases; // الأمراض الشائعة
   final String careInstructions; // تعليمات العناية
+  final bool isActive; // هل الحيوان نشط
   final DateTime createdAt;
+  final DateTime updatedAt;
 
   Pet({
     required this.id,
@@ -20,7 +22,9 @@ class Pet {
     required this.foods,
     required this.diseases,
     required this.careInstructions,
+    this.isActive = true,
     required this.createdAt,
+    required this.updatedAt,
   });
 
   factory Pet.fromJson(Map<String, dynamic> json) {
@@ -34,7 +38,13 @@ class Pet {
       foods: List<String>.from(json['foods'] ?? []),
       diseases: List<String>.from(json['diseases'] ?? []),
       careInstructions: json['care_instructions'] ?? '',
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
+      isActive: json['is_active'] ?? true,
+      createdAt: DateTime.parse(
+        json['created_at'] ?? DateTime.now().toIso8601String(),
+      ),
+      updatedAt: DateTime.parse(
+        json['updated_at'] ?? DateTime.now().toIso8601String(),
+      ),
     );
   }
 
@@ -49,7 +59,9 @@ class Pet {
       'foods': foods,
       'diseases': diseases,
       'care_instructions': careInstructions,
+      'is_active': isActive,
       'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 }

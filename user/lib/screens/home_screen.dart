@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/pet.dart';
 import '../constants/app_constants.dart';
+import '../services/pet_service.dart';
 import 'pet_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,61 +22,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadPets() async {
-    // بيانات تجريبية للحيوانات
-    setState(() {
-      pets = [
-        Pet(
-          id: '1',
-          name: 'Kedi',
-          type: 'Kedi',
-          imageUrl:
-              'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
-          description: 'Kediler dünyada en popüler evcil hayvanlardan biridir',
-          features: ['Sevimli', 'Temiz', 'Bağımsız'],
-          foods: ['Balık', 'Et', 'Kuru mama'],
-          diseases: [
-            'İdrar yolu enfeksiyonu',
-            'Böbrek hastalıkları',
-            'Diyabet',
-          ],
-          careInstructions: 'Düzenli kum temizliği ve aşılar gerektirir',
-          createdAt: DateTime.now(),
-        ),
-        Pet(
-          id: '2',
-          name: 'Köpek',
-          type: 'Köpek',
-          imageUrl:
-              'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400',
-          description:
-              'Köpekler insanın en iyi dostu ve en sadık hayvanlarıdır',
-          features: ['Sadık', 'Zeki', 'Aktif'],
-          foods: ['Et', 'Kuru mama', 'Sebzeler'],
-          diseases: ['Kuduz', 'Eklem iltihabı', 'Kalp hastalıkları'],
-          careInstructions: 'Günlük egzersiz ve düzenli eğitim gerektirir',
-          createdAt: DateTime.now(),
-        ),
-        Pet(
-          id: '3',
-          name: 'Kuş',
-          type: 'Kuş',
-          imageUrl:
-              'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400',
-          description: 'Kuşlar eve neşe ve canlılık getirir',
-          features: ['Renkli', 'Aktif', 'Sosyal'],
-          foods: ['Tohumlar', 'Meyveler', 'Sebzeler'],
-          diseases: [
-            'Solunum yolu hastalıkları',
-            'Enfeksiyonlar',
-            'Tüy problemleri',
-          ],
-          careInstructions:
-              'Geniş ve temiz kafes ile günlük etkileşim gerektirir',
-          createdAt: DateTime.now(),
-        ),
-      ];
-      isLoading = false;
-    });
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final petsData = await PetService.getAllPets();
+
+      setState(() {
+        pets = petsData;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Veri yükleme hatası: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -133,22 +104,48 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   // Pets Grid
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppConstants.mediumPadding,
-                      ),
-                      child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 1,
-                              childAspectRatio: 2.5,
-                              crossAxisSpacing: AppConstants.mediumPadding,
-                              mainAxisSpacing: AppConstants.mediumPadding,
-                            ),
-                        itemCount: pets.length,
-                        itemBuilder: (context, index) {
-                          return _buildPetCard(pets[index]);
-                        },
+                    child: RefreshIndicator(
+                      onRefresh: _loadPets,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppConstants.mediumPadding,
+                        ),
+                        child: pets.isEmpty
+                            ? const Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.pets,
+                                      size: 64,
+                                      color: Colors.grey,
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'Şu anda mevcut hayvan yok',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 1,
+                                      childAspectRatio: 2.5,
+                                      crossAxisSpacing:
+                                          AppConstants.mediumPadding,
+                                      mainAxisSpacing:
+                                          AppConstants.mediumPadding,
+                                    ),
+                                itemCount: pets.length,
+                                itemBuilder: (context, index) {
+                                  return _buildPetCard(pets[index]);
+                                },
+                              ),
                       ),
                     ),
                   ),
