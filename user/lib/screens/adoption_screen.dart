@@ -26,17 +26,17 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
       adoptionPets = [
         AdoptionPet(
           id: '1',
-          name: 'قطة صغيرة',
-          type: 'قطة',
+          name: 'Küçük Kedi',
+          type: 'Kedi',
           imageUrl:
               'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
           description:
-              'قطة صغيرة جميلة تبحث عن منزل دافئ، ودودة جداً ومناسبة للعائلات',
-          city: 'جدة',
+              'Sıcak bir yuva arayan güzel küçük kedi, çok sevimli ve aileler için uygun',
+          city: 'İzmir',
           contactNumber: '0501234567',
           whatsappNumber: '0501234567',
-          age: 3, // 3 أشهر
-          gender: 'أنثى',
+          age: 3, // 3 ay
+          gender: 'Dişi',
           isVaccinated: true,
           isNeutered: false,
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -44,17 +44,17 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
         ),
         AdoptionPet(
           id: '2',
-          name: 'كلب لابرادور',
-          type: 'كلب',
+          name: 'Labrador Köpek',
+          type: 'Köpek',
           imageUrl:
               'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400',
           description:
-              'كلب لابرادور ودود وذكي، مناسب للعائلات التي لديها أطفال',
-          city: 'الرياض',
+              'Sevimli ve zeki Labrador köpek, çocuklu aileler için uygun',
+          city: 'Ankara',
           contactNumber: '0507654321',
           whatsappNumber: '0507654321',
-          age: 12, // 12 شهر
-          gender: 'ذكر',
+          age: 12, // 12 ay
+          gender: 'Erkek',
           isVaccinated: true,
           isNeutered: true,
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
@@ -69,7 +69,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('إعلانات التبني'),
+        title: const Text('Sahiplendirme İlanları'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,

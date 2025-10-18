@@ -57,11 +57,11 @@ class _MainScreenState extends State<MainScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildNavItem(context, 1, Icons.search, 'مفقودات', false),
-          _buildNavItem(context, 2, Icons.favorite, 'تبني', false),
-          _buildNavItem(context, 0, Icons.home, 'الرئيسية', true),
-          _buildNavItem(context, 3, Icons.medical_services, 'لقاحات', false),
-          _buildNavItem(context, 4, Icons.person, 'حسابي', false),
+          _buildNavItem(context, 1, Icons.search, 'Kayıp', false),
+          _buildNavItem(context, 2, Icons.favorite, 'Sahiplendir', false),
+          _buildNavItem(context, 0, Icons.home, 'Ana Sayfa', true),
+          _buildNavItem(context, 3, Icons.medical_services, 'Aşılar', false),
+          _buildNavItem(context, 4, Icons.person, 'Profilim', false),
         ],
       ),
     );

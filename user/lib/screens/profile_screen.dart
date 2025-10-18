@@ -13,7 +13,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  
+
   bool _isEditing = false;
 
   @override
@@ -31,9 +31,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _loadUserData() {
-    // بيانات تجريبية للمستخدم
-    _nameController.text = 'أحمد محمد';
-    _emailController.text = 'ahmed@example.com';
+    // Kullanıcı için örnek veriler
+    _nameController.text = 'Ahmet Yılmaz';
+    _emailController.text = 'ahmet@example.com';
     _phoneController.text = '0501234567';
   }
 
@@ -41,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('حسابي'),
+        title: const Text('Profilim'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -71,19 +71,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 // Profile Image Section
                 _buildProfileImageSection(),
-                
+
                 const SizedBox(height: AppConstants.extraLargePadding),
-                
+
                 // Profile Information
                 _buildProfileInfoSection(),
-                
+
                 const SizedBox(height: AppConstants.extraLargePadding),
-                
+
                 // Statistics Section
                 _buildStatisticsSection(),
-                
+
                 const SizedBox(height: AppConstants.extraLargePadding),
-                
+
                 // Action Buttons
                 _buildActionButtons(),
               ],
@@ -118,7 +118,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: ClipOval(
                 child: Container(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   child: Icon(
                     Icons.person,
                     size: 60,
@@ -150,17 +152,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: AppConstants.mediumPadding),
         Text(
-          _nameController.text.isNotEmpty ? _nameController.text : 'المستخدم',
+          _nameController.text.isNotEmpty ? _nameController.text : 'Kullanıcı',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
         Text(
-          'عضو في PatiWorld',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Colors.grey[600],
-          ),
+          'PatiWorld Üyesi',
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
         ),
       ],
     );
@@ -178,54 +180,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'معلومات الحساب',
+              'Hesap Bilgileri',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: AppConstants.mediumPadding),
-            
+
             // Full Name
             _buildInfoField(
-              label: 'الاسم الكامل',
+              label: 'Ad Soyad',
               controller: _nameController,
               icon: Icons.person,
               enabled: _isEditing,
               validator: (value) {
                 if (_isEditing && (value == null || value.isEmpty)) {
-                  return 'يرجى إدخال الاسم الكامل';
+                  return 'Lütfen ad soyad giriniz';
                 }
                 return null;
               },
             ),
-            
+
             const SizedBox(height: AppConstants.mediumPadding),
-            
+
             // Email
             _buildInfoField(
-              label: 'البريد الإلكتروني',
+              label: 'E-posta',
               controller: _emailController,
               icon: Icons.email,
               enabled: false, // Email cannot be changed
               keyboardType: TextInputType.emailAddress,
             ),
-            
+
             const SizedBox(height: AppConstants.mediumPadding),
-            
+
             // Phone Number
             _buildInfoField(
-              label: 'رقم الهاتف',
+              label: 'Telefon Numarası',
               controller: _phoneController,
               icon: Icons.phone,
               enabled: _isEditing,
               keyboardType: TextInputType.phone,
               validator: (value) {
                 if (_isEditing && (value == null || value.isEmpty)) {
-                  return 'يرجى إدخال رقم الهاتف';
+                  return 'Lütfen telefon numarası giriniz';
                 }
                 if (_isEditing && value != null && value.length < 10) {
-                  return 'رقم الهاتف يجب أن يكون 10 أرقام على الأقل';
+                  return 'Telefon numarası en az 10 haneli olmalıdır';
                 }
                 return null;
               },
@@ -261,7 +263,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           keyboardType: keyboardType,
           validator: validator,
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
+            prefixIcon: Icon(
+              icon,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey[300]!),
@@ -297,7 +302,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'إحصائياتك',
+              'İstatistikleriniz',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
@@ -308,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'إعلانات المفقودات',
+                    'Kayıp İlanları',
                     '2',
                     Icons.search,
                     Colors.blue,
@@ -317,7 +322,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: AppConstants.mediumPadding),
                 Expanded(
                   child: _buildStatCard(
-                    'إعلانات التبني',
+                    'Sahiplendirme İlanları',
                     '1',
                     Icons.favorite,
                     Colors.pink,
@@ -330,7 +335,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'لقاحات مسجلة',
+                    'Kayıtlı Aşılar',
                     '3',
                     Icons.medical_services,
                     Colors.green,
@@ -339,7 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: AppConstants.mediumPadding),
                 Expanded(
                   child: _buildStatCard(
-                    'أيام في التطبيق',
+                    'Uygulamada Gün',
                     '15',
                     Icons.calendar_today,
                     Colors.orange,
@@ -353,15 +358,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppConstants.mediumPadding),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -396,7 +404,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: ElevatedButton.icon(
             onPressed: _isEditing ? _saveProfile : _toggleEdit,
             icon: Icon(_isEditing ? Icons.save : Icons.edit),
-            label: Text(_isEditing ? 'حفظ التغييرات' : 'تعديل الملف الشخصي'),
+            label: Text(
+              _isEditing ? 'Değişiklikleri Kaydet' : 'Profili Düzenle',
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
@@ -413,7 +423,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: OutlinedButton.icon(
             onPressed: _showLogoutDialog,
             icon: const Icon(Icons.logout),
-            label: const Text('تسجيل الخروج'),
+            label: const Text('Çıkış Yap'),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.red,
               side: const BorderSide(color: Colors.red),
@@ -441,14 +451,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       // محاكاة عملية الحفظ
       await Future.delayed(const Duration(seconds: 2));
-      
+
       setState(() {
         _isEditing = false;
       });
-      
-      _showSuccessSnackBar('تم حفظ التغييرات بنجاح');
+
+      _showSuccessSnackBar('Değişiklikler başarıyla kaydedildi');
     } catch (e) {
-      _showErrorSnackBar('حدث خطأ أثناء حفظ التغييرات');
+      _showErrorSnackBar('Değişiklikler kaydedilirken hata oluştu');
     }
   }
 
@@ -456,19 +466,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تسجيل الخروج'),
-        content: const Text('هل أنت متأكد من تسجيل الخروج؟'),
+        title: const Text('Çıkış Yap'),
+        content: const Text('Çıkış yapmak istediğinizden emin misiniz?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: const Text('İptal'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _performLogout();
             },
-            child: const Text('تسجيل الخروج', style: TextStyle(color: Colors.red)),
+            child: const Text('Çıkış Yap', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -477,28 +487,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _performLogout() async {
     try {
-      _showSuccessSnackBar('تم تسجيل الخروج بنجاح');
+      _showSuccessSnackBar('Başarıyla çıkış yapıldı');
       // TODO: Navigate to login screen
     } catch (e) {
-      _showErrorSnackBar('حدث خطأ أثناء تسجيل الخروج');
+      _showErrorSnackBar('Çıkış yapılırken hata oluştu');
     }
   }
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.green),
     );
   }
 }

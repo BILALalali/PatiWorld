@@ -26,12 +26,13 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
       lostPets = [
         LostPet(
           id: '1',
-          name: 'قطة صغيرة',
-          type: 'قطة',
+          name: 'Küçük Kedi',
+          type: 'Kedi',
           imageUrl:
               'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
-          description: 'قطة صغيرة مفقودة في حي النرجس، لونها أبيض مع بقع سوداء',
-          city: 'الرياض',
+          description:
+              'Nergis mahallesinde kayıp küçük kedi, beyaz renkli siyah lekeli',
+          city: 'İstanbul',
           contactNumber: '0501234567',
           whatsappNumber: '0501234567',
           lostDate: DateTime.now().subtract(const Duration(days: 2)),
@@ -40,12 +41,12 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
         ),
         LostPet(
           id: '2',
-          name: 'كلب جولدن',
-          type: 'كلب',
+          name: 'Golden Köpek',
+          type: 'Köpek',
           imageUrl:
               'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400',
-          description: 'كلب جولدن ريتريفر مفقود في حي العليا، ودود جداً',
-          city: 'الرياض',
+          description: 'Ulus mahallesinde kayıp Golden Retriever, çok sevimli',
+          city: 'İstanbul',
           contactNumber: '0507654321',
           whatsappNumber: '0507654321',
           lostDate: DateTime.now().subtract(const Duration(days: 5)),
@@ -61,7 +62,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('إعلانات المفقودات'),
+        title: const Text('Kayıp Hayvan İlanları'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -92,14 +93,14 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
           Icon(Icons.search_off, size: 100, color: Colors.grey[400]),
           const SizedBox(height: AppConstants.mediumPadding),
           Text(
-            'لا توجد إعلانات مفقودات حالياً',
+            'Şu anda kayıp hayvan ilanı yok',
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'كن أول من يضيف إعلان عن حيوان مفقود',
+            'Kayıp hayvan ilanı ekleyen ilk kişi olun',
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),

@@ -26,38 +26,51 @@ class _HomeScreenState extends State<HomeScreen> {
       pets = [
         Pet(
           id: '1',
-          name: 'قطة',
-          type: 'قطة',
-          imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
-          description: 'القطط من أكثر الحيوانات الأليفة شعبية في العالم',
-          features: ['ودودة', 'نظيفة', 'مستقلة'],
-          foods: ['السمك', 'اللحم', 'الطعام الجاف'],
-          diseases: ['التهاب المسالك البولية', 'أمراض الكلى', 'السكري'],
-          careInstructions: 'تتطلب تنظيف دوري للصندوق الرمل وتطعيمات منتظمة',
+          name: 'Kedi',
+          type: 'Kedi',
+          imageUrl:
+              'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
+          description: 'Kediler dünyada en popüler evcil hayvanlardan biridir',
+          features: ['Sevimli', 'Temiz', 'Bağımsız'],
+          foods: ['Balık', 'Et', 'Kuru mama'],
+          diseases: [
+            'İdrar yolu enfeksiyonu',
+            'Böbrek hastalıkları',
+            'Diyabet',
+          ],
+          careInstructions: 'Düzenli kum temizliği ve aşılar gerektirir',
           createdAt: DateTime.now(),
         ),
         Pet(
           id: '2',
-          name: 'كلب',
-          type: 'كلب',
-          imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400',
-          description: 'الكلاب أفضل أصدقاء الإنسان وأكثر الحيوانات وفاءً',
-          features: ['مخلص', 'ذكي', 'نشط'],
-          foods: ['اللحم', 'الطعام الجاف', 'الخضروات'],
-          diseases: ['داء الكلب', 'التهاب المفاصل', 'أمراض القلب'],
-          careInstructions: 'تحتاج إلى تمرين يومي وتدريب منتظم',
+          name: 'Köpek',
+          type: 'Köpek',
+          imageUrl:
+              'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400',
+          description:
+              'Köpekler insanın en iyi dostu ve en sadık hayvanlarıdır',
+          features: ['Sadık', 'Zeki', 'Aktif'],
+          foods: ['Et', 'Kuru mama', 'Sebzeler'],
+          diseases: ['Kuduz', 'Eklem iltihabı', 'Kalp hastalıkları'],
+          careInstructions: 'Günlük egzersiz ve düzenli eğitim gerektirir',
           createdAt: DateTime.now(),
         ),
         Pet(
           id: '3',
-          name: 'طائر',
-          type: 'طائر',
-          imageUrl: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400',
-          description: 'الطيور تجلب البهجة والحيوية للمنزل',
-          features: ['ملون', 'نشط', 'اجتماعي'],
-          foods: ['البذور', 'الفواكه', 'الخضروات'],
-          diseases: ['أمراض الجهاز التنفسي', 'الالتهابات', 'مشاكل الريش'],
-          careInstructions: 'تحتاج إلى قفص واسع ونظيف وتفاعل يومي',
+          name: 'Kuş',
+          type: 'Kuş',
+          imageUrl:
+              'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400',
+          description: 'Kuşlar eve neşe ve canlılık getirir',
+          features: ['Renkli', 'Aktif', 'Sosyal'],
+          foods: ['Tohumlar', 'Meyveler', 'Sebzeler'],
+          diseases: [
+            'Solunum yolu hastalıkları',
+            'Enfeksiyonlar',
+            'Tüy problemleri',
+          ],
+          careInstructions:
+              'Geniş ve temiz kafes ile günlük etkileşim gerektirir',
           createdAt: DateTime.now(),
         ),
       ];
@@ -71,10 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           'PatiWorld',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
@@ -88,7 +98,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     Colors.white,
                   ],
                 ),
@@ -101,19 +113,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       children: [
                         Text(
-                          'مرحباً بك في عالم الحيوانات الأليفة',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                          'Evcil Hayvan Dünyasına Hoş Geldiniz',
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: AppConstants.smallPadding),
                         Text(
-                          'اكتشف معلومات مفيدة عن رعاية حيواناتك الأليفة',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          'Evcil hayvanlarınızın bakımı hakkında faydalı bilgiler keşfedin',
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(color: Colors.grey[600]),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -126,12 +138,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         horizontal: AppConstants.mediumPadding,
                       ),
                       child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1,
-                          childAspectRatio: 2.5,
-                          crossAxisSpacing: AppConstants.mediumPadding,
-                          mainAxisSpacing: AppConstants.mediumPadding,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 1,
+                              childAspectRatio: 2.5,
+                              crossAxisSpacing: AppConstants.mediumPadding,
+                              mainAxisSpacing: AppConstants.mediumPadding,
+                            ),
                         itemCount: pets.length,
                         itemBuilder: (context, index) {
                           return _buildPetCard(pets[index]);
@@ -150,9 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => PetDetailScreen(pet: pet),
-          ),
+          MaterialPageRoute(builder: (context) => PetDetailScreen(pet: pet)),
         );
       },
       child: Card(
@@ -211,9 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (loadingProgress == null) return child;
                       return Container(
                         color: Colors.grey[200],
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        child: const Center(child: CircularProgressIndicator()),
                       );
                     },
                   ),
@@ -261,15 +270,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               feature,
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 10,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontSize: 10,
+                                  ),
                             ),
                           );
                         }).toList(),
@@ -280,7 +294,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // Arrow Icon
               Padding(
-                padding: const EdgeInsets.only(right: AppConstants.smallPadding),
+                padding: const EdgeInsets.only(
+                  right: AppConstants.smallPadding,
+                ),
                 child: Icon(
                   Icons.arrow_forward_ios,
                   color: Theme.of(context).colorScheme.primary,

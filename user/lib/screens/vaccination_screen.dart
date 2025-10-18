@@ -26,37 +26,39 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
       vaccinations = [
         Vaccination(
           id: '1',
-          petName: 'قطة صغيرة',
-          petType: 'قطة',
-          vaccineName: 'لقاح أساسي',
+          petName: 'Küçük Kedi',
+          petType: 'Kedi',
+          vaccineName: 'Temel Aşı',
           vaccineDate: DateTime.now().subtract(const Duration(days: 20)),
           nextVaccineDate: DateTime.now().add(const Duration(days: 10)),
           vaccineNumber: 1,
-          notes: 'لقاح أساسي للقطط الصغيرة',
+          notes: 'Küçük kediler için temel aşı',
           createdAt: DateTime.now().subtract(const Duration(days: 20)),
           userId: 'user1',
         ),
         Vaccination(
           id: '2',
-          petName: 'كلب لابرادور',
-          petType: 'كلب',
-          vaccineName: 'لقاح ضد داء الكلب',
+          petName: 'Labrador Köpek',
+          petType: 'Köpek',
+          vaccineName: 'Kuduz Aşısı',
           vaccineDate: DateTime.now().subtract(const Duration(days: 5)),
           nextVaccineDate: DateTime.now().add(const Duration(days: 25)),
           vaccineNumber: 2,
-          notes: 'لقاح سنوي ضد داء الكلب',
+          notes: 'Yıllık kuduz aşısı',
           createdAt: DateTime.now().subtract(const Duration(days: 5)),
           userId: 'user1',
         ),
         Vaccination(
           id: '3',
-          petName: 'قطة كبيرة',
-          petType: 'قطة',
-          vaccineName: 'لقاح سنوي',
+          petName: 'Büyük Kedi',
+          petType: 'Kedi',
+          vaccineName: 'Yıllık Aşı',
           vaccineDate: DateTime.now().subtract(const Duration(days: 30)),
-          nextVaccineDate: DateTime.now().add(const Duration(days: 0)), // انتهى الموعد
+          nextVaccineDate: DateTime.now().add(
+            const Duration(days: 0),
+          ), // süresi doldu
           vaccineNumber: 3,
-          notes: 'لقاح سنوي شامل',
+          notes: 'Kapsamlı yıllık aşı',
           createdAt: DateTime.now().subtract(const Duration(days: 30)),
           userId: 'user1',
         ),
@@ -69,7 +71,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('جدول اللقاحات'),
+        title: const Text('Aşı Takvimi'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -77,8 +79,8 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : vaccinations.isEmpty
-              ? _buildEmptyState()
-              : _buildVaccinationsList(),
+          ? _buildEmptyState()
+          : _buildVaccinationsList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -107,16 +109,16 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
           const SizedBox(height: AppConstants.mediumPadding),
           Text(
             'لا توجد لقاحات مسجلة',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Colors.grey[600],
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
             'أضف لقاحات حيواناتك الأليفة لتتبع مواعيدها',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[500],
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
             textAlign: TextAlign.center,
           ),
         ],
@@ -149,7 +151,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   Widget _buildVaccinationCard(Vaccination vaccination) {
     final isOverdue = vaccination.isVaccineOverdue;
     final daysUntilNext = vaccination.daysUntilNextVaccine;
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: AppConstants.mediumPadding),
       elevation: AppConstants.cardElevation,
@@ -159,9 +161,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
-          border: isOverdue 
-              ? Border.all(color: Colors.red, width: 2)
-              : null,
+          border: isOverdue ? Border.all(color: Colors.red, width: 2) : null,
         ),
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.mediumPadding),
@@ -177,16 +177,16 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                       children: [
                         Text(
                           vaccination.petName,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                         Text(
                           vaccination.petType,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -197,32 +197,32 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: isOverdue 
+                      color: isOverdue
                           ? Colors.red.withValues(alpha: 0.1)
-                          : daysUntilNext <= 7 
-                              ? Colors.orange.withValues(alpha: 0.1)
-                              : Colors.green.withValues(alpha: 0.1),
+                          : daysUntilNext <= 7
+                          ? Colors.orange.withValues(alpha: 0.1)
+                          : Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: isOverdue 
+                        color: isOverdue
                             ? Colors.red.withValues(alpha: 0.3)
-                            : daysUntilNext <= 7 
-                                ? Colors.orange.withValues(alpha: 0.3)
-                                : Colors.green.withValues(alpha: 0.3),
+                            : daysUntilNext <= 7
+                            ? Colors.orange.withValues(alpha: 0.3)
+                            : Colors.green.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Text(
-                      isOverdue 
+                      isOverdue
                           ? 'انتهى الموعد'
-                          : daysUntilNext <= 7 
-                              ? 'قريباً'
-                              : 'مجدول',
+                          : daysUntilNext <= 7
+                          ? 'قريباً'
+                          : 'مجدول',
                       style: TextStyle(
-                        color: isOverdue 
+                        color: isOverdue
                             ? Colors.red[700]
-                            : daysUntilNext <= 7 
-                                ? Colors.orange[700]
-                                : Colors.green[700],
+                            : daysUntilNext <= 7
+                            ? Colors.orange[700]
+                            : Colors.green[700],
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -230,9 +230,9 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: AppConstants.mediumPadding),
-              
+
               // Vaccine Info
               Row(
                 children: [
@@ -252,15 +252,15 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                   ),
                   Text(
                     'لقاح #${vaccination.vaccineNumber}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: AppConstants.mediumPadding),
-              
+
               // Dates
               Row(
                 children: [
@@ -283,7 +283,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                   ),
                 ],
               ),
-              
+
               if (vaccination.notes.isNotEmpty) ...[
                 const SizedBox(height: AppConstants.mediumPadding),
                 Container(
@@ -291,20 +291,22 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                   padding: const EdgeInsets.all(AppConstants.smallPadding),
                   decoration: BoxDecoration(
                     color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(AppConstants.smallRadius),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.smallRadius,
+                    ),
                     border: Border.all(color: Colors.grey[200]!),
                   ),
                   child: Text(
                     vaccination.notes,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[700],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
                   ),
                 ),
               ],
-              
+
               const SizedBox(height: AppConstants.mediumPadding),
-              
+
               // Action Buttons
               Row(
                 children: [
@@ -346,15 +348,18 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
     );
   }
 
-  Widget _buildDateInfo(String label, DateTime date, IconData icon, Color color) {
+  Widget _buildDateInfo(
+    String label,
+    DateTime date,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppConstants.smallPadding),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppConstants.smallRadius),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -412,7 +417,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
       setState(() {
         vaccinations.removeWhere((v) => v.id == vaccination.id);
       });
-      
+
       _showSuccessSnackBar('تم حذف اللقاح بنجاح');
     } catch (e) {
       _showErrorSnackBar('حدث خطأ أثناء حذف اللقاح');
@@ -421,28 +426,19 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
 
   void _showInfoSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.blue,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.blue),
     );
   }
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.green),
     );
   }
 }

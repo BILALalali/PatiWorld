@@ -5,9 +5,10 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:user/main.dart';
+import 'package:pati_world/main.dart';
 
 void main() {
   testWidgets('PatiWorld app smoke test', (WidgetTester tester) async {
@@ -23,5 +24,15 @@ void main() {
       find.text('اكتشف معلومات مفيدة عن رعاية حيواناتك الأليفة'),
       findsOneWidget,
     );
+
+    // Verify that the bottom navigation bar is present
+    expect(find.byType(Container), findsWidgets);
+    
+    // Verify that the home navigation item is present (it's always visible)
+    expect(find.text('الرئيسية'), findsOneWidget);
+    
+    // Verify that the app builds without errors
+    expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.byType(Scaffold), findsAtLeastNWidgets(1));
   });
 }
