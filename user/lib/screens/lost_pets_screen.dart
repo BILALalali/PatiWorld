@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/lost_pet.dart';
 import '../constants/app_constants.dart';
+import '../services/lost_pet_service.dart';
 import 'add_lost_pet_screen.dart';
 
 class LostPetsScreen extends StatefulWidget {
@@ -13,7 +13,11 @@ class LostPetsScreen extends StatefulWidget {
 
 class _LostPetsScreenState extends State<LostPetsScreen> {
   List<LostPet> lostPets = [];
+  List<LostPet> filteredLostPets = [];
   bool isLoading = true;
+  String searchQuery = '';
+  String selectedType = 'Tümü';
+  String selectedCity = 'Tümü';
 
   @override
   void initState() {
@@ -23,29 +27,14 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
 
   Future<void> _loadLostPets() async {
     try {
-      final response = await Supabase.instance.client
-          .from(AppConstants.lostPetsTable)
-          .select()
-          .eq('is_active', true)
-          .order('created_at', ascending: false);
-
+      final pets = await LostPetService.getAllLostPets();
       setState(() {
-        lostPets = response
-            .map((json) {
-              try {
-                return LostPet.fromJson(json);
-              } catch (e) {
-                print('Error parsing lost pet: $e');
-                return null;
-              }
-            })
-            .where((pet) => pet != null)
-            .cast<LostPet>()
-            .toList();
+        lostPets = pets;
+        _applyFilters();
         isLoading = false;
       });
     } catch (e) {
-      print('Error loading lost pets: $e');
+      // Error loading lost pets
       setState(() {
         lostPets = [];
         isLoading = false;
@@ -61,6 +50,35 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
     }
   }
 
+  void _applyFilters() {
+    setState(() {
+      filteredLostPets = lostPets.where((pet) {
+        // Search filter
+        if (searchQuery.isNotEmpty) {
+          final query = searchQuery.toLowerCase();
+          if (!pet.name.toLowerCase().contains(query) &&
+              !pet.description.toLowerCase().contains(query) &&
+              !pet.type.toLowerCase().contains(query) &&
+              !pet.city.toLowerCase().contains(query)) {
+            return false;
+          }
+        }
+
+        // Type filter
+        if (selectedType != 'Tümü' && pet.type != selectedType) {
+          return false;
+        }
+
+        // City filter
+        if (selectedCity != 'Tümü' && pet.city != selectedCity) {
+          return false;
+        }
+
+        return true;
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,12 +87,57 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          if (searchQuery.isNotEmpty || selectedType != 'Tümü' || selectedCity != 'Tümü')
+            IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                setState(() {
+                  searchQuery = '';
+                  selectedType = 'Tümü';
+                  selectedCity = 'Tümü';
+                });
+                _applyFilters();
+              },
+            ),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: _showSearchDialog,
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.filter_list,
+              color: (selectedType != 'Tümü' || selectedCity != 'Tümü') 
+                  ? Colors.yellow 
+                  : Colors.white,
+            ),
+            onPressed: _showFilterDialog,
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : lostPets.isEmpty
+          : filteredLostPets.isEmpty
           ? _buildEmptyState()
-          : _buildLostPetsList(),
+          : Column(
+              children: [
+                if (searchQuery.isNotEmpty || selectedType != 'Tümü' || selectedCity != 'Tümü')
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppConstants.smallPadding),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    child: Text(
+                      '${filteredLostPets.length} sonuç bulundu',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                Expanded(child: _buildLostPetsList()),
+              ],
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -127,9 +190,9 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
       ),
       child: ListView.builder(
         padding: const EdgeInsets.all(AppConstants.mediumPadding),
-        itemCount: lostPets.length,
+        itemCount: filteredLostPets.length,
         itemBuilder: (context, index) {
-          return _buildLostPetCard(lostPets[index]);
+          return _buildLostPetCard(filteredLostPets[index]);
         },
       ),
     );
@@ -423,6 +486,119 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   void _showInfoSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.blue),
+    );
+  }
+
+  void _showSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Arama'),
+        content: TextField(
+          decoration: const InputDecoration(
+            hintText: 'Hayvan adı, türü, şehir veya açıklama...',
+            border: OutlineInputBorder(),
+          ),
+          onChanged: (value) {
+            setState(() {
+              searchQuery = value;
+            });
+          },
+          controller: TextEditingController(text: searchQuery),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                searchQuery = '';
+              });
+              _applyFilters();
+              Navigator.pop(context);
+            },
+            child: const Text('Temizle'),
+          ),
+          TextButton(
+            onPressed: () {
+              _applyFilters();
+              Navigator.pop(context);
+            },
+            child: const Text('Ara'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Filtrele'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Type Filter
+            DropdownButtonFormField<String>(
+              value: selectedType,
+              decoration: const InputDecoration(
+                labelText: 'Hayvan Türü',
+                border: OutlineInputBorder(),
+              ),
+              items: ['Tümü', ...AppConstants.petTypes].map((type) {
+                return DropdownMenuItem<String>(
+                  value: type,
+                  child: Text(type),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedType = value!;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            // City Filter
+            DropdownButtonFormField<String>(
+              value: selectedCity,
+              decoration: const InputDecoration(
+                labelText: 'Şehir',
+                border: OutlineInputBorder(),
+              ),
+              items: ['Tümü', ...AppConstants.cities].map((city) {
+                return DropdownMenuItem<String>(
+                  value: city,
+                  child: Text(city),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedCity = value!;
+                });
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                selectedType = 'Tümü';
+                selectedCity = 'Tümü';
+              });
+              _applyFilters();
+              Navigator.pop(context);
+            },
+            child: const Text('Sıfırla'),
+          ),
+          TextButton(
+            onPressed: () {
+              _applyFilters();
+              Navigator.pop(context);
+            },
+            child: const Text('Uygula'),
+          ),
+        ],
+      ),
     );
   }
 }
