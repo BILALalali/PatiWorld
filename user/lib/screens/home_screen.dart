@@ -133,9 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               )
                             : GridView.builder(
                                 gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                    SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 1,
-                                      childAspectRatio: 2.5,
+                                      childAspectRatio:
+                                          _calculateChildAspectRatio(context),
                                       crossAxisSpacing:
                                           AppConstants.mediumPadding,
                                       mainAxisSpacing:
@@ -153,6 +154,33 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
     );
+  }
+
+  double _calculateChildAspectRatio(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Calculate available height for the grid
+    final appBarHeight = kToolbarHeight;
+    final statusBarHeight = MediaQuery.of(context).padding.top;
+    final headerHeight = 120.0; // Approximate header height
+    final bottomNavHeight = 85.0; // Approximate bottom nav height
+    final padding = AppConstants.mediumPadding * 2;
+
+    final availableHeight =
+        screenHeight -
+        appBarHeight -
+        statusBarHeight -
+        headerHeight -
+        bottomNavHeight -
+        padding;
+
+    // Calculate aspect ratio based on available space
+    final aspectRatio =
+        screenWidth / (availableHeight / 2); // 2 items per screen
+
+    // Ensure minimum and maximum aspect ratios
+    return aspectRatio.clamp(2.0, 3.5);
   }
 
   Widget _buildPetCard(Pet pet) {
@@ -231,46 +259,52 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.all(AppConstants.mediumPadding),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      // Pet Name
                       Text(
                         pet.name,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.primary,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: AppConstants.smallPadding),
+                      // Pet Type
                       Text(
                         pet.type,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.grey[600],
                         ),
-                      ),
-                      const SizedBox(height: AppConstants.smallPadding),
-                      Text(
-                        pet.description,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[700],
-                        ),
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: AppConstants.smallPadding),
+                      // Description
+                      Expanded(
+                        child: Text(
+                          pet.description,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.grey[700]),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                       // Features
                       Wrap(
                         spacing: 4,
+                        runSpacing: 2,
                         children: pet.features.take(3).map((feature) {
                           return Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
+                              horizontal: 6,
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
                               color: Theme.of(
                                 context,
                               ).colorScheme.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
                               feature,
@@ -279,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.primary,
-                                    fontSize: 10,
+                                    fontSize: 9,
                                   ),
                             ),
                           );

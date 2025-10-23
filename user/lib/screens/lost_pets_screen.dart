@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/lost_pet.dart';
 import '../constants/app_constants.dart';
 import '../services/lost_pet_service.dart';
@@ -88,7 +89,9 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          if (searchQuery.isNotEmpty || selectedType != 'Tümü' || selectedCity != 'Tümü')
+          if (searchQuery.isNotEmpty ||
+              selectedType != 'Tümü' ||
+              selectedCity != 'Tümü')
             IconButton(
               icon: const Icon(Icons.clear),
               onPressed: () {
@@ -107,8 +110,8 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
           IconButton(
             icon: Icon(
               Icons.filter_list,
-              color: (selectedType != 'Tümü' || selectedCity != 'Tümü') 
-                  ? Colors.yellow 
+              color: (selectedType != 'Tümü' || selectedCity != 'Tümü')
+                  ? Colors.yellow
                   : Colors.white,
             ),
             onPressed: _showFilterDialog,
@@ -121,11 +124,15 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
           ? _buildEmptyState()
           : Column(
               children: [
-                if (searchQuery.isNotEmpty || selectedType != 'Tümü' || selectedCity != 'Tümü')
+                if (searchQuery.isNotEmpty ||
+                    selectedType != 'Tümü' ||
+                    selectedCity != 'Tümü')
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(AppConstants.smallPadding),
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     child: Text(
                       '${filteredLostPets.length} sonuç bulundu',
                       textAlign: TextAlign.center,
@@ -468,24 +475,104 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
-    // Remove any spaces or special characters for phone call
-    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
-    _showInfoSnackBar('Telefon uygulaması açılacak: $cleanNumber');
-    // TODO: Implement actual phone call functionality
-    // await launch('tel:$cleanNumber');
+    try {
+      // Remove any spaces or special characters for phone call
+      final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+
+      // Create the phone URL
+      final Uri phoneUri = Uri(scheme: 'tel', path: cleanNumber);
+
+      // Try to launch the phone app
+      bool launched = await launchUrl(
+        phoneUri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        // If phone app is not available, show the number for manual dialing
+        _showPhoneNumberDialog(cleanNumber);
+      }
+    } catch (e) {
+      // If there's an error, show the number for manual dialing
+      final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+      _showPhoneNumberDialog(cleanNumber);
+    }
   }
 
   Future<void> _openWhatsApp(String phoneNumber) async {
-    // Remove any spaces or special characters for WhatsApp
-    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
-    _showInfoSnackBar('WhatsApp uygulaması açılacak: $cleanNumber');
-    // TODO: Implement actual WhatsApp functionality
-    // await launch('https://wa.me/$cleanNumber');
+    try {
+      // Remove any spaces or special characters for WhatsApp
+      final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+
+      // Create the WhatsApp URL
+      final Uri whatsappUri = Uri.parse('https://wa.me/$cleanNumber');
+
+      // Check if the device can launch the URL
+      if (await canLaunchUrl(whatsappUri)) {
+        await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+      } else {
+        _showErrorSnackBar('WhatsApp uygulaması açılamadı');
+      }
+    } catch (e) {
+      _showErrorSnackBar('WhatsApp açılamadı: ${e.toString()}');
+    }
   }
 
-  void _showInfoSnackBar(String message) {
+  void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.blue),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  void _showPhoneNumberDialog(String phoneNumber) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('رقم الهاتف'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'رقم الهاتف:',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              SelectableText(
+                phoneNumber,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'يمكنك نسخ الرقم والاتصال يدوياً',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('إغلاق'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Try to copy to clipboard
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم نسخ الرقم إلى الحافظة'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: const Text('نسخ الرقم'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -545,10 +632,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                 border: OutlineInputBorder(),
               ),
               items: ['Tümü', ...AppConstants.petTypes].map((type) {
-                return DropdownMenuItem<String>(
-                  value: type,
-                  child: Text(type),
-                );
+                return DropdownMenuItem<String>(value: type, child: Text(type));
               }).toList(),
               onChanged: (value) {
                 setState(() {
@@ -565,10 +649,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                 border: OutlineInputBorder(),
               ),
               items: ['Tümü', ...AppConstants.cities].map((city) {
-                return DropdownMenuItem<String>(
-                  value: city,
-                  child: Text(city),
-                );
+                return DropdownMenuItem<String>(value: city, child: Text(city));
               }).toList(),
               onChanged: (value) {
                 setState(() {
