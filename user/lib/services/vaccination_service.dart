@@ -8,9 +8,12 @@ class VaccinationService {
   // Yeni aşı ekle
   static Future<Vaccination> addVaccination(Vaccination vaccination) async {
     try {
-      // Sahte ID ile veri kopyası oluştur
       final vaccinationData = vaccination.toJson();
-      vaccinationData['user_id'] = '00000000-0000-0000-0000-000000000001';
+      print('Original vaccination data: $vaccinationData');
+
+      // Remove id field for new vaccinations - let database generate it
+      vaccinationData.remove('id');
+      print('Vaccination data after removing id: $vaccinationData');
 
       final response = await _supabase
           .from(AppConstants.vaccinationsTable)
@@ -18,8 +21,10 @@ class VaccinationService {
           .select()
           .single();
 
+      print('Response from database: $response');
       return Vaccination.fromJson(response);
     } catch (e) {
+      print('Error adding vaccination: $e');
       throw Exception('Aşı ekleme başarısız: $e');
     }
   }
@@ -27,10 +32,16 @@ class VaccinationService {
   // Kullanıcının tüm aşılarını getir
   static Future<List<Vaccination>> getUserVaccinations() async {
     try {
-      // Test için user_id filtresi olmadan tüm aşıları getir
+      // Get current user ID
+      final user = _supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('Kullanıcı giriş yapmamış');
+      }
+
       final response = await _supabase
           .from(AppConstants.vaccinationsTable)
           .select()
+          .eq('user_id', user.id)
           .order('created_at', ascending: false);
 
       return (response as List)
