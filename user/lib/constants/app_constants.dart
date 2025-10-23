@@ -16,12 +16,12 @@ class AppConstants {
   static const String profileImagesBucket = 'profile-images';
 
   // App Colors
-  static const int primaryColor = 0xFF2E7D32; // أخضر
-  static const int secondaryColor = 0xFF4CAF50; // أخضر فاتح
-  static const int accentColor = 0xFF81C784; // أخضر فاتح جداً
-  static const int errorColor = 0xFFE57373; // أحمر فاتح
-  static const int warningColor = 0xFFFFB74D; // برتقالي
-  static const int infoColor = 0xFF64B5F6; // أزرق فاتح
+  static const int primaryColor = 0xFF2E7D32; // Yeşil
+  static const int secondaryColor = 0xFF4CAF50; // Açık yeşil
+  static const int accentColor = 0xFF81C784; // Çok açık yeşil
+  static const int errorColor = 0xFFE57373; // Açık kırmızı
+  static const int warningColor = 0xFFFFB74D; // Turuncu
+  static const int infoColor = 0xFF64B5F6; // Açık mavi
 
   // Text Styles
   static const double titleFontSize = 24.0;

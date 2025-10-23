@@ -5,7 +5,7 @@ import '../constants/app_constants.dart';
 class LostPetService {
   static final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// جلب جميع الحيوانات المفقودة النشطة
+  /// Tüm aktif kayıp hayvanları getir
   static Future<List<LostPet>> getAllLostPets() async {
     try {
       final response = await _supabase
@@ -14,15 +14,13 @@ class LostPetService {
           .eq('is_active', true)
           .order('created_at', ascending: false);
 
-      return (response as List)
-          .map((json) => LostPet.fromJson(json))
-          .toList();
+      return (response as List).map((json) => LostPet.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('فشل في جلب الحيوانات المفقودة: $e');
+      throw Exception('Kayıp hayvanları getirme başarısız: $e');
     }
   }
 
-  /// جلب حيوان مفقود محدد بالمعرف
+  /// ID ile belirli kayıp hayvanı getir
   static Future<LostPet?> getLostPetById(String id) async {
     try {
       final response = await _supabase
@@ -38,7 +36,7 @@ class LostPetService {
     }
   }
 
-  /// جلب الحيوانات المفقودة حسب النوع
+  /// Türüne göre kayıp hayvanları getir
   static Future<List<LostPet>> getLostPetsByType(String type) async {
     try {
       final response = await _supabase
@@ -48,15 +46,13 @@ class LostPetService {
           .eq('is_active', true)
           .order('created_at', ascending: false);
 
-      return (response as List)
-          .map((json) => LostPet.fromJson(json))
-          .toList();
+      return (response as List).map((json) => LostPet.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('فشل في جلب الحيوانات المفقودة: $e');
+      throw Exception('Kayıp hayvanları getirme başarısız: $e');
     }
   }
 
-  /// جلب الحيوانات المفقودة حسب المدينة
+  /// Şehre göre kayıp hayvanları getir
   static Future<List<LostPet>> getLostPetsByCity(String city) async {
     try {
       final response = await _supabase
@@ -66,15 +62,13 @@ class LostPetService {
           .eq('is_active', true)
           .order('created_at', ascending: false);
 
-      return (response as List)
-          .map((json) => LostPet.fromJson(json))
-          .toList();
+      return (response as List).map((json) => LostPet.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('فشل في جلب الحيوانات المفقودة: $e');
+      throw Exception('Kayıp hayvanları getirme başarısız: $e');
     }
   }
 
-  /// البحث في الحيوانات المفقودة
+  /// Kayıp hayvanlarda arama yap
   static Future<List<LostPet>> searchLostPets(String query) async {
     try {
       final response = await _supabase
@@ -86,15 +80,13 @@ class LostPetService {
           )
           .order('created_at', ascending: false);
 
-      return (response as List)
-          .map((json) => LostPet.fromJson(json))
-          .toList();
+      return (response as List).map((json) => LostPet.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('فشل في البحث: $e');
+      throw Exception('Arama başarısız: $e');
     }
   }
 
-  /// إضافة حيوان مفقود جديد
+  /// Yeni kayıp hayvan ekle
   static Future<LostPet> addLostPet({
     required String name,
     required String type,
@@ -116,10 +108,14 @@ class LostPetService {
         'type': type,
         'description': description,
         'city': city,
-        'lost_date': lostDate.toIso8601String().split('T')[0], // Format as YYYY-MM-DD
+        'lost_date': lostDate.toIso8601String().split(
+          'T',
+        )[0], // Format as YYYY-MM-DD
         'contact_number': contactNumber,
         'whatsapp_number': whatsappNumber,
-        'image_url': imageUrl ?? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
+        'image_url':
+            imageUrl ??
+            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
         'age_months': ageMonths,
         'gender': gender,
         'is_vaccinated': isVaccinated,
@@ -136,11 +132,11 @@ class LostPetService {
 
       return LostPet.fromJson(response);
     } catch (e) {
-      throw Exception('فشل في إضافة الحيوان المفقود: $e');
+      throw Exception('Kayıp hayvan ekleme başarısız: $e');
     }
   }
 
-  /// تحديث حيوان مفقود
+  /// Kayıp hayvanı güncelle
   static Future<LostPet> updateLostPet(LostPet lostPet) async {
     try {
       final response = await _supabase
@@ -152,11 +148,11 @@ class LostPetService {
 
       return LostPet.fromJson(response);
     } catch (e) {
-      throw Exception('فشل في تحديث الحيوان المفقود: $e');
+      throw Exception('Kayıp hayvan güncelleme başarısız: $e');
     }
   }
 
-  /// حذف حيوان مفقود (حذف منطقي)
+  /// Kayıp hayvanı sil (mantıksal silme)
   static Future<void> deleteLostPet(String id) async {
     try {
       await _supabase
@@ -164,11 +160,11 @@ class LostPetService {
           .update({'is_active': false})
           .eq('id', id);
     } catch (e) {
-      throw Exception('فشل في حذف الحيوان المفقود: $e');
+      throw Exception('Kayıp hayvan silme başarısız: $e');
     }
   }
 
-  /// جلب الحيوانات المفقودة للمستخدم الحالي
+  /// Mevcut kullanıcının kayıp hayvanlarını getir
   static Future<List<LostPet>> getUserLostPets(String userId) async {
     try {
       final response = await _supabase
@@ -178,15 +174,13 @@ class LostPetService {
           .eq('is_active', true)
           .order('created_at', ascending: false);
 
-      return (response as List)
-          .map((json) => LostPet.fromJson(json))
-          .toList();
+      return (response as List).map((json) => LostPet.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('فشل في جلب حيواناتك المفقودة: $e');
+      throw Exception('Kayıp hayvanlarınızı getirme başarısız: $e');
     }
   }
 
-  /// جلب إحصائيات الحيوانات المفقودة
+  /// Kayıp hayvan istatistiklerini getir
   static Future<Map<String, int>> getLostPetStats() async {
     try {
       final response = await _supabase
@@ -200,7 +194,7 @@ class LostPetService {
       for (var pet in response) {
         final type = pet['type'] as String;
         final city = pet['city'] as String;
-        
+
         typeStats[type] = (typeStats[type] ?? 0) + 1;
         cityStats[city] = (cityStats[city] ?? 0) + 1;
       }
@@ -211,11 +205,11 @@ class LostPetService {
         'by_city_count': cityStats.length,
       };
     } catch (e) {
-      throw Exception('فشل في جلب الإحصائيات: $e');
+      throw Exception('İstatistik getirme başarısız: $e');
     }
   }
 
-  /// تحديث حالة الحيوان المفقود (تم العثور عليه)
+  /// Kayıp hayvan durumunu güncelle (bulundu)
   static Future<void> markAsFound(String id) async {
     try {
       await _supabase
@@ -223,7 +217,7 @@ class LostPetService {
           .update({'is_active': false})
           .eq('id', id);
     } catch (e) {
-      throw Exception('فشل في تحديث حالة الحيوان: $e');
+      throw Exception('Hayvan durumu güncelleme başarısız: $e');
     }
   }
 }

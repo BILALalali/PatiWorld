@@ -4,7 +4,7 @@ import '../models/pet.dart';
 class PetService {
   static final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// جلب جميع الحيوانات النشطة
+  /// Tüm aktif hayvanları getir
   static Future<List<Pet>> getAllPets() async {
     try {
       final response = await _supabase
@@ -15,11 +15,11 @@ class PetService {
 
       return (response as List).map((json) => Pet.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('فشل في جلب البيانات: $e');
+      throw Exception('Veri getirme başarısız: $e');
     }
   }
 
-  /// جلب حيوان محدد بالمعرف
+  /// ID ile belirli hayvanı getir
   static Future<Pet?> getPetById(String id) async {
     try {
       final response = await _supabase
@@ -35,7 +35,7 @@ class PetService {
     }
   }
 
-  /// جلب الحيوانات حسب النوع
+  /// Türüne göre hayvanları getir
   static Future<List<Pet>> getPetsByType(String type) async {
     try {
       final response = await _supabase
@@ -47,11 +47,11 @@ class PetService {
 
       return (response as List).map((json) => Pet.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('فشل في جلب البيانات: $e');
+      throw Exception('Veri getirme başarısız: $e');
     }
   }
 
-  /// البحث في الحيوانات
+  /// Hayvanlarda arama yap
   static Future<List<Pet>> searchPets(String query) async {
     try {
       final response = await _supabase
@@ -65,11 +65,11 @@ class PetService {
 
       return (response as List).map((json) => Pet.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('فشل في البحث: $e');
+      throw Exception('Arama başarısız: $e');
     }
   }
 
-  /// إضافة حيوان جديد (للمديرين)
+  /// Yeni hayvan ekle (yöneticiler için)
   static Future<Pet> addPet(Pet pet) async {
     try {
       final response = await _supabase
@@ -80,11 +80,11 @@ class PetService {
 
       return Pet.fromJson(response);
     } catch (e) {
-      throw Exception('فشل في إضافة الحيوان: $e');
+      throw Exception('Hayvan ekleme başarısız: $e');
     }
   }
 
-  /// تحديث حيوان (للمديرين)
+  /// Hayvanı güncelle (yöneticiler için)
   static Future<Pet> updatePet(Pet pet) async {
     try {
       final response = await _supabase
@@ -96,20 +96,20 @@ class PetService {
 
       return Pet.fromJson(response);
     } catch (e) {
-      throw Exception('فشل في تحديث الحيوان: $e');
+      throw Exception('Hayvan güncelleme başarısız: $e');
     }
   }
 
-  /// حذف حيوان (للمديرين) - حذف منطقي
+  /// Hayvanı sil (yöneticiler için) - mantıksal silme
   static Future<void> deletePet(String id) async {
     try {
       await _supabase.from('pets').update({'is_active': false}).eq('id', id);
     } catch (e) {
-      throw Exception('فشل في حذف الحيوان: $e');
+      throw Exception('Hayvan silme başarısız: $e');
     }
   }
 
-  /// جلب إحصائيات الحيوانات
+  /// Hayvan istatistiklerini getir
   static Future<Map<String, int>> getPetStats() async {
     try {
       final response = await _supabase
@@ -125,7 +125,7 @@ class PetService {
 
       return stats;
     } catch (e) {
-      throw Exception('فشل في جلب الإحصائيات: $e');
+      throw Exception('İstatistik getirme başarısız: $e');
     }
   }
 }

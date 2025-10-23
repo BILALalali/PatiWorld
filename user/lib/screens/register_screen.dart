@@ -321,8 +321,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           FilteringTextInputFormatter.digitsOnly,
                         ],
                         decoration: InputDecoration(
-                          labelText: 'رقم الهاتف',
-                          hintText: 'أدخل رقم هاتفك',
+                          labelText: 'Telefon Numarası',
+                          hintText: 'Telefon numaranızı girin',
                           prefixIcon: const Icon(Icons.phone_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(

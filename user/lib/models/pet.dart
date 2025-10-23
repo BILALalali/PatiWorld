@@ -1,14 +1,14 @@
 class Pet {
   final String id;
   final String name;
-  final String type; // نوع الحيوان (قطة، كلب، إلخ)
+  final String type; // Hayvan türü (kedi, köpek, vb.)
   final String imageUrl;
   final String description;
-  final List<String> features; // أهم الصفات
-  final List<String> foods; // الأطعمة المفضلة
-  final List<String> diseases; // الأمراض الشائعة
-  final String careInstructions; // تعليمات العناية
-  final bool isActive; // هل الحيوان نشط
+  final List<String> features; // En önemli özellikler
+  final List<String> foods; // Favori yiyecekler
+  final List<String> diseases; // Yaygın hastalıklar
+  final String careInstructions; // Bakım talimatları
+  final bool isActive; // Hayvan aktif mi
   final DateTime createdAt;
   final DateTime updatedAt;
 

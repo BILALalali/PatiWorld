@@ -529,12 +529,12 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('رقم الهاتف'),
+          title: const Text('Telefon Numarası'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'رقم الهاتف:',
+                'Telefon Numarası:',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -547,7 +547,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'يمكنك نسخ الرقم والاتصال يدوياً',
+                'Numarayı kopyalayıp manuel olarak arayabilirsiniz',
                 style: TextStyle(color: Colors.grey),
               ),
             ],
@@ -555,7 +555,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('إغلاق'),
+              child: const Text('Kapat'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -563,12 +563,12 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                 // Try to copy to clipboard
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('تم نسخ الرقم إلى الحافظة'),
+                    content: Text('Numara panoya kopyalandı'),
                     backgroundColor: Colors.green,
                   ),
                 );
               },
-              child: const Text('نسخ الرقم'),
+              child: const Text('Numarayı Kopyala'),
             ),
           ],
         );

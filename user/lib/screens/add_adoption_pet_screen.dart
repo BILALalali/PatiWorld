@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../constants/app_constants.dart';
+import 'location_picker_screen.dart';
 
 class AddAdoptionPetScreen extends StatefulWidget {
   const AddAdoptionPetScreen({super.key});
@@ -27,6 +28,9 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
   bool _isNeutered = false;
   bool _isLoading = false;
   File? _selectedImage;
+  double? _selectedLatitude;
+  double? _selectedLongitude;
+  String _selectedLocationName = 'Konum seçilmedi';
 
   @override
   void dispose() {
@@ -127,6 +131,11 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                     });
                   },
                 ),
+
+                const SizedBox(height: AppConstants.mediumPadding),
+
+                // Location Picker
+                _buildLocationPickerField(),
 
                 const SizedBox(height: AppConstants.mediumPadding),
 
@@ -502,6 +511,111 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
     );
   }
 
+  Widget _buildLocationPickerField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Konum',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: AppConstants.smallPadding),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[300]!),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: _selectedLatitude != null
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey[400],
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _selectedLocationName,
+                      style: TextStyle(
+                        color: _selectedLatitude != null
+                            ? Colors.black87
+                            : Colors.grey[600],
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _pickLocationFromMap,
+                  icon: const Icon(Icons.map, size: 18),
+                  label: const Text('Haritadan Konum Seç'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              if (_selectedLatitude != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.green.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: Colors.green[700],
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Konum seçildi',
+                        style: TextStyle(
+                          color: Colors.green[700],
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildHealthStatusSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -568,6 +682,21 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
     setState(() {
       _selectedImage = null;
     });
+  }
+
+  Future<void> _pickLocationFromMap() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LocationPickerScreen()),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        _selectedLatitude = result['latitude'];
+        _selectedLongitude = result['longitude'];
+        _selectedLocationName = result['address'] ?? 'Seçilen konum';
+      });
+    }
   }
 
   Future<String?> _uploadImageToSupabase() async {
@@ -639,6 +768,8 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
         'gender': _selectedGender,
         'is_vaccinated': _isVaccinated,
         'is_neutered': _isNeutered,
+        'latitude': _selectedLatitude,
+        'longitude': _selectedLongitude,
         'created_at': DateTime.now().toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
         'user_id': user.id,

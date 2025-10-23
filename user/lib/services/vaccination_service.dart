@@ -5,13 +5,13 @@ import '../constants/app_constants.dart';
 class VaccinationService {
   static final SupabaseClient _supabase = Supabase.instance.client;
 
-  // إضافة لقاح جديد
+  // Yeni aşı ekle
   static Future<Vaccination> addVaccination(Vaccination vaccination) async {
     try {
-      // إنشاء نسخة من البيانات مع معرف وهمي
+      // Sahte ID ile veri kopyası oluştur
       final vaccinationData = vaccination.toJson();
       vaccinationData['user_id'] = '00000000-0000-0000-0000-000000000001';
-      
+
       final response = await _supabase
           .from(AppConstants.vaccinationsTable)
           .insert(vaccinationData)
@@ -20,14 +20,14 @@ class VaccinationService {
 
       return Vaccination.fromJson(response);
     } catch (e) {
-      throw Exception('فشل في إضافة اللقاح: $e');
+      throw Exception('Aşı ekleme başarısız: $e');
     }
   }
 
-  // جلب جميع لقاحات المستخدم
+  // Kullanıcının tüm aşılarını getir
   static Future<List<Vaccination>> getUserVaccinations() async {
     try {
-      // جلب جميع اللقاحات بدون فلترة user_id للاختبار
+      // Test için user_id filtresi olmadan tüm aşıları getir
       final response = await _supabase
           .from(AppConstants.vaccinationsTable)
           .select()
@@ -37,11 +37,11 @@ class VaccinationService {
           .map((json) => Vaccination.fromJson(json))
           .toList();
     } catch (e) {
-      throw Exception('فشل في جلب اللقاحات: $e');
+      throw Exception('Aşıları getirme başarısız: $e');
     }
   }
 
-  // جلب لقاح محدد
+  // Belirli aşıyı getir
   static Future<Vaccination> getVaccination(String id) async {
     try {
       final response = await _supabase
@@ -52,17 +52,17 @@ class VaccinationService {
 
       return Vaccination.fromJson(response);
     } catch (e) {
-      throw Exception('فشل في جلب اللقاح: $e');
+      throw Exception('Aşı getirme başarısız: $e');
     }
   }
 
-  // تحديث لقاح
+  // Aşıyı güncelle
   static Future<Vaccination> updateVaccination(Vaccination vaccination) async {
     try {
-      // إنشاء نسخة من البيانات مع معرف وهمي
+      // Sahte ID ile veri kopyası oluştur
       final vaccinationData = vaccination.toJson();
       vaccinationData['user_id'] = '00000000-0000-0000-0000-000000000001';
-      
+
       final response = await _supabase
           .from(AppConstants.vaccinationsTable)
           .update(vaccinationData)
@@ -72,11 +72,11 @@ class VaccinationService {
 
       return Vaccination.fromJson(response);
     } catch (e) {
-      throw Exception('فشل في تحديث اللقاح: $e');
+      throw Exception('Aşı güncelleme başarısız: $e');
     }
   }
 
-  // حذف لقاح
+  // Aşıyı sil
   static Future<void> deleteVaccination(String id) async {
     try {
       await _supabase
@@ -84,15 +84,15 @@ class VaccinationService {
           .delete()
           .eq('id', id);
     } catch (e) {
-      throw Exception('فشل في حذف اللقاح: $e');
+      throw Exception('Aşı silme başarısız: $e');
     }
   }
 
-  // جلب اللقاحات المنتهية الصلاحية
+  // Süresi geçmiş aşıları getir
   static Future<List<Vaccination>> getOverdueVaccinations() async {
     try {
       final now = DateTime.now().toIso8601String().split('T')[0];
-      
+
       final response = await _supabase
           .from(AppConstants.vaccinationsTable)
           .select()
@@ -103,16 +103,16 @@ class VaccinationService {
           .map((json) => Vaccination.fromJson(json))
           .toList();
     } catch (e) {
-      throw Exception('فشل في جلب اللقاحات المنتهية الصلاحية: $e');
+      throw Exception('Süresi geçmiş aşıları getirme başarısız: $e');
     }
   }
 
-  // جلب اللقاحات القادمة (خلال 7 أيام)
+  // Yaklaşan aşıları getir (7 gün içinde)
   static Future<List<Vaccination>> getUpcomingVaccinations() async {
     try {
       final now = DateTime.now();
       final nextWeek = now.add(const Duration(days: 7));
-      
+
       final response = await _supabase
           .from(AppConstants.vaccinationsTable)
           .select()
@@ -124,11 +124,11 @@ class VaccinationService {
           .map((json) => Vaccination.fromJson(json))
           .toList();
     } catch (e) {
-      throw Exception('فشل في جلب اللقاحات القادمة: $e');
+      throw Exception('Yaklaşan aşıları getirme başarısız: $e');
     }
   }
 
-  // جلب إحصائيات اللقاحات
+  // Aşı istatistiklerini getir
   static Future<Map<String, int>> getVaccinationStats() async {
     try {
       final allVaccinations = await getUserVaccinations();
@@ -139,10 +139,13 @@ class VaccinationService {
         'total': allVaccinations.length,
         'overdue': overdueVaccinations.length,
         'upcoming': upcomingVaccinations.length,
-        'scheduled': allVaccinations.length - overdueVaccinations.length - upcomingVaccinations.length,
+        'scheduled':
+            allVaccinations.length -
+            overdueVaccinations.length -
+            upcomingVaccinations.length,
       };
     } catch (e) {
-      throw Exception('فشل في جلب إحصائيات اللقاحات: $e');
+      throw Exception('Aşı istatistiklerini getirme başarısız: $e');
     }
   }
 }

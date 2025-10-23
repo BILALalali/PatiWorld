@@ -11,6 +11,8 @@ class AdoptionPet {
   final String gender; // Gender
   final bool isVaccinated; // Is vaccinated
   final bool isNeutered; // Is neutered
+  final double? latitude; // Pet location latitude
+  final double? longitude; // Pet location longitude
   final DateTime createdAt;
   final String userId;
 
@@ -27,6 +29,8 @@ class AdoptionPet {
     required this.gender,
     required this.isVaccinated,
     required this.isNeutered,
+    this.latitude,
+    this.longitude,
     required this.createdAt,
     required this.userId,
   });
@@ -45,6 +49,8 @@ class AdoptionPet {
       gender: json['gender'] ?? '',
       isVaccinated: json['is_vaccinated'] ?? false,
       isNeutered: json['is_neutered'] ?? false,
+      latitude: json['latitude']?.toDouble(),
+      longitude: json['longitude']?.toDouble(),
       createdAt: DateTime.parse(
         json['created_at'] ?? DateTime.now().toIso8601String(),
       ),
@@ -66,6 +72,8 @@ class AdoptionPet {
       'gender': gender,
       'is_vaccinated': isVaccinated,
       'is_neutered': isNeutered,
+      'latitude': latitude,
+      'longitude': longitude,
       'created_at': createdAt.toIso8601String(),
       'user_id': userId,
     };

@@ -5,7 +5,7 @@ class Vaccination {
   final String vaccineName;
   final DateTime vaccineDate;
   final DateTime nextVaccineDate;
-  final int vaccineNumber; // رقم اللقاح
+  final int vaccineNumber; // Aşı numarası
   final String notes;
   final DateTime createdAt;
   final String userId;
@@ -29,11 +29,17 @@ class Vaccination {
       petName: json['pet_name'] ?? '',
       petType: json['pet_type'] ?? '',
       vaccineName: json['vaccine_name'] ?? '',
-      vaccineDate: DateTime.parse(json['vaccine_date'] ?? DateTime.now().toIso8601String()),
-      nextVaccineDate: DateTime.parse(json['next_vaccine_date'] ?? DateTime.now().toIso8601String()),
+      vaccineDate: DateTime.parse(
+        json['vaccine_date'] ?? DateTime.now().toIso8601String(),
+      ),
+      nextVaccineDate: DateTime.parse(
+        json['next_vaccine_date'] ?? DateTime.now().toIso8601String(),
+      ),
       vaccineNumber: json['vaccine_number'] ?? 1,
       notes: json['notes'] ?? '',
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        json['created_at'] ?? DateTime.now().toIso8601String(),
+      ),
       userId: json['user_id'] ?? '',
     );
   }
@@ -53,14 +59,14 @@ class Vaccination {
     };
   }
 
-  // حساب الأيام المتبقية للقاح التالي
+  // Sonraki aşı için kalan günleri hesapla
   int get daysUntilNextVaccine {
     final now = DateTime.now();
     final difference = nextVaccineDate.difference(now).inDays;
     return difference > 0 ? difference : 0;
   }
 
-  // التحقق من انتهاء موعد اللقاح
+  // Aşı tarihinin geçip geçmediğini kontrol et
   bool get isVaccineOverdue {
     return DateTime.now().isAfter(nextVaccineDate);
   }

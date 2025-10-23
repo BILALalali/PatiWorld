@@ -5,37 +5,37 @@ import '../constants/app_constants.dart';
 class StorageService {
   static final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// تنظيف اسم الملف من الرموز غير الصالحة
+  /// Dosya adını geçersiz karakterlerden temizle
   static String _cleanFileName(String input) {
-    // إزالة جميع الرموز غير الصالحة واستبدالها بـ _
+    // Tüm geçersiz karakterleri kaldır ve _ ile değiştir
     return input.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
   }
 
-  /// رفع صورة حيوان مفقود
+  /// Kayıp hayvan resmi yükle
   static Future<String> uploadLostPetImage({
     required File imageFile,
     required String userId,
     required String petName,
   }) async {
     try {
-      // التحقق من تسجيل الدخول
+      // Giriş kontrolü
       final user = _supabase.auth.currentUser;
       if (user == null) {
         throw Exception('Kullanıcı giriş yapmamış');
       }
 
-      // إنشاء اسم فريد للملف
+      // Benzersiz dosya adı oluştur
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final cleanPetName = _cleanFileName(petName);
       final cleanUserId = _cleanFileName(userId);
       final fileName = 'lost_pet_${cleanUserId}_${cleanPetName}_$timestamp.jpg';
 
-      // رفع الصورة إلى Storage
+      // Resmi Storage'a yükle
       await _supabase.storage
           .from(AppConstants.petImagesBucket)
           .upload(fileName, imageFile);
 
-      // الحصول على رابط الصورة العامة
+      // Genel resim bağlantısını al
       final imageUrl = _supabase.storage
           .from(AppConstants.petImagesBucket)
           .getPublicUrl(fileName);
@@ -52,91 +52,91 @@ class StorageService {
     required String petName,
   }) async {
     try {
-      // التحقق من تسجيل الدخول
+      // Giriş kontrolü
       final user = _supabase.auth.currentUser;
       if (user == null) {
-        throw Exception('المستخدم غير مسجل دخول');
+        throw Exception('Kullanıcı giriş yapmamış');
       }
 
-      // إنشاء الـ bucket إذا لم يكن موجوداً
+      // Bucket yoksa oluştur
       final bucketCreated = await createBucketIfNotExists(
         AppConstants.petImagesBucket,
       );
       if (!bucketCreated) {
-        throw Exception('فشل في إنشاء أو الوصول للـ bucket');
+        throw Exception('Bucket oluşturma veya erişim başarısız');
       }
 
-      // إنشاء اسم فريد للملف
+      // Benzersiz dosya adı oluştur
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final cleanPetName = _cleanFileName(petName);
       final cleanUserId = _cleanFileName(userId);
       final fileName =
           'adoption_pet_${cleanUserId}_${cleanPetName}_$timestamp.jpg';
 
-      // رفع الصورة إلى bucket
+      // Resmi bucket'a yükle
       await _supabase.storage
           .from(AppConstants.petImagesBucket)
           .upload(fileName, imageFile);
 
-      // الحصول على رابط الصورة العامة
+      // Genel resim bağlantısını al
       final imageUrl = _supabase.storage
           .from(AppConstants.petImagesBucket)
           .getPublicUrl(fileName);
 
       return imageUrl;
     } catch (e) {
-      throw Exception('فشل في رفع الصورة: $e');
+      throw Exception('Resim yükleme başarısız: $e');
     }
   }
 
-  /// رفع صورة الملف الشخصي
+  /// Profil resmi yükle
   static Future<String> uploadProfileImage({
     required File imageFile,
     required String userId,
   }) async {
     try {
-      // التحقق من تسجيل الدخول
+      // Giriş kontrolü
       final user = _supabase.auth.currentUser;
       if (user == null) {
-        throw Exception('المستخدم غير مسجل دخول');
+        throw Exception('Kullanıcı giriş yapmamış');
       }
 
-      // إنشاء الـ bucket إذا لم يكن موجوداً
+      // Bucket yoksa oluştur
       final bucketCreated = await createBucketIfNotExists(
         AppConstants.profileImagesBucket,
       );
       if (!bucketCreated) {
-        throw Exception('فشل في إنشاء أو الوصول للـ bucket');
+        throw Exception('Bucket oluşturma veya erişim başarısız');
       }
 
-      // إنشاء اسم فريد للملف
+      // Benzersiz dosya adı oluştur
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final cleanUserId = _cleanFileName(userId);
       final fileName = 'profile_${cleanUserId}_$timestamp.jpg';
 
-      // رفع الصورة إلى bucket
+      // Resmi bucket'a yükle
       await _supabase.storage
           .from(AppConstants.profileImagesBucket)
           .upload(fileName, imageFile);
 
-      // الحصول على رابط الصورة العامة
+      // Genel resim bağlantısını al
       final imageUrl = _supabase.storage
           .from(AppConstants.profileImagesBucket)
           .getPublicUrl(fileName);
 
       return imageUrl;
     } catch (e) {
-      throw Exception('فشل في رفع صورة الملف الشخصي: $e');
+      throw Exception('Profil resmi yükleme başarısız: $e');
     }
   }
 
-  /// حذف صورة
+  /// Resmi sil
   static Future<void> deleteImage(String imageUrl) async {
     try {
-      // استخراج اسم الملف من الرابط
+      // Dosya adını bağlantıdan çıkar
       final fileName = imageUrl.split('/').last;
 
-      // تحديد الـ bucket بناءً على نوع الصورة
+      // Resim türüne göre bucket belirle
       String bucketName;
       if (imageUrl.contains('profile')) {
         bucketName = AppConstants.profileImagesBucket;
@@ -144,45 +144,45 @@ class StorageService {
         bucketName = AppConstants.petImagesBucket;
       }
 
-      // حذف الصورة
+      // Resmi sil
       await _supabase.storage.from(bucketName).remove([fileName]);
     } catch (e) {
-      throw Exception('فشل في حذف الصورة: $e');
+      throw Exception('Resim silme başarısız: $e');
     }
   }
 
-  /// ضغط الصورة قبل الرفع (اختياري)
+  /// Yüklemeden önce resmi sıkıştır (isteğe bağlı)
   static Future<File> compressImage(File imageFile) async {
-    // يمكن إضافة مكتبة ضغط الصور هنا مثل flutter_image_compress
-    // للآن سنعيد نفس الملف
+    // Burada flutter_image_compress gibi resim sıkıştırma kütüphanesi eklenebilir
+    // Şimdilik aynı dosyayı döndürüyoruz
     return imageFile;
   }
 
-  /// التحقق من صحة نوع الملف
+  /// Dosya türünün geçerliliğini kontrol et
   static bool isValidImageType(String filePath) {
     final extension = filePath.toLowerCase().split('.').last;
     return ['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(extension);
   }
 
-  /// التحقق من حجم الملف
+  /// Dosya boyutunu kontrol et
   static bool isValidImageSize(File imageFile) {
     const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
     return imageFile.lengthSync() <= maxSizeInBytes;
   }
 
-  /// اختبار الاتصال بـ Storage
+  /// Storage bağlantısını test et
   static Future<bool> testStorageConnection() async {
     try {
-      // التحقق من تسجيل الدخول أولاً
+      // Önce giriş kontrolü
       final user = _supabase.auth.currentUser;
       print('Current user: ${user?.id ?? "Not logged in"}');
 
-      // محاولة جلب قائمة الـ buckets
+      // Bucket listesini getirmeyi dene
       final buckets = await _supabase.storage.listBuckets();
       print('Available buckets: ${buckets.map((b) => b.name).toList()}');
       print('Looking for bucket: ${AppConstants.petImagesBucket}');
 
-      // التحقق من وجود الـ bucket المطلوب
+      // Gerekli bucket'ın varlığını kontrol et
       final hasPetImagesBucket = buckets.any(
         (bucket) => bucket.name == AppConstants.petImagesBucket,
       );
@@ -202,7 +202,7 @@ class StorageService {
     }
   }
 
-  /// التحقق من وجود الـ bucket
+  /// Bucket'ın varlığını kontrol et
   static Future<bool> bucketExists(String bucketName) async {
     try {
       final buckets = await _supabase.storage.listBuckets();
@@ -213,22 +213,22 @@ class StorageService {
     }
   }
 
-  /// إنشاء الـ bucket إذا لم يكن موجوداً
+  /// Bucket yoksa oluştur
   static Future<bool> createBucketIfNotExists(String bucketName) async {
     try {
-      // التحقق من وجود الـ bucket أولاً
+      // Önce bucket'ın varlığını kontrol et
       final exists = await bucketExists(bucketName);
       if (exists) {
         print('✅ Bucket $bucketName already exists');
         return true;
       }
 
-      // إنشاء الـ bucket
+      // Bucket'ı oluştur
       print('Creating bucket: $bucketName');
       await _supabase.storage.createBucket(
         bucketName,
         BucketOptions(
-          public: true, // جعل الـ bucket عام للوصول للصور
+          public: true, // Resimlere erişim için bucket'ı genel yap
           allowedMimeTypes: [
             'image/jpeg',
             'image/png',
@@ -244,7 +244,7 @@ class StorageService {
     } catch (e) {
       print('❌ Failed to create bucket $bucketName: $e');
 
-      // تحليل نوع الخطأ وإعطاء رسالة واضحة
+      // Hata türünü analiz et ve net mesaj ver
       if (e.toString().contains('row-level security policy') ||
           e.toString().contains('Unauthorized') ||
           e.toString().contains('403')) {
@@ -262,17 +262,17 @@ class StorageService {
     }
   }
 
-  /// إعداد Storage بالكامل (إنشاء جميع الـ buckets المطلوبة)
+  /// Storage'ı tamamen ayarla (gerekli tüm bucket'ları oluştur)
   static Future<bool> setupStorage() async {
     try {
       print('🚀 Setting up Storage...');
 
-      // إنشاء bucket صور الحيوانات
+      // Hayvan resimleri bucket'ını oluştur
       final petImagesBucketCreated = await createBucketIfNotExists(
         AppConstants.petImagesBucket,
       );
 
-      // إنشاء bucket صور الملفات الشخصية
+      // Profil resimleri bucket'ını oluştur
       final profileImagesBucketCreated = await createBucketIfNotExists(
         AppConstants.profileImagesBucket,
       );

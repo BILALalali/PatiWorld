@@ -24,7 +24,7 @@ class PatiWorldApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2E7D32), // لون أخضر للحيوانات
+          seedColor: const Color(0xFF2E7D32), // Hayvanlar için yeşil renk
           brightness: Brightness.light,
         ),
         useMaterial3: true,

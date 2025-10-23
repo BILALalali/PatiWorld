@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/adoption_pet.dart';
 import '../constants/app_constants.dart';
 import 'add_adoption_pet_screen.dart';
+import 'pet_location_screen.dart';
 
 class AdoptionScreen extends StatefulWidget {
   const AdoptionScreen({super.key});
@@ -300,6 +301,21 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(width: AppConstants.smallPadding),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _showPetLocation(adoptionPet),
+                        icon: const Icon(Icons.location_on, size: 18),
+                        label: const Text('Konum'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -376,16 +392,16 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
     try {
       // Remove any spaces or special characters for phone call
       final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
-      
+
       // Create the phone URL
       final Uri phoneUri = Uri(scheme: 'tel', path: cleanNumber);
-      
+
       // Try to launch the phone app
       bool launched = await launchUrl(
         phoneUri,
         mode: LaunchMode.externalApplication,
       );
-      
+
       if (!launched) {
         // If phone app is not available, show the number for manual dialing
         _showPhoneNumberDialog(cleanNumber);
@@ -422,17 +438,26 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
     );
   }
 
+  void _showPetLocation(AdoptionPet adoptionPet) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PetLocationScreen(adoptionPet: adoptionPet),
+      ),
+    );
+  }
+
   void _showPhoneNumberDialog(String phoneNumber) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('رقم الهاتف'),
+          title: const Text('Telefon Numarası'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'رقم الهاتف:',
+                'Telefon Numarası:',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -445,7 +470,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'يمكنك نسخ الرقم والاتصال يدوياً',
+                'Numarayı kopyalayıp manuel olarak arayabilirsiniz',
                 style: TextStyle(color: Colors.grey),
               ),
             ],
@@ -453,7 +478,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('إغلاق'),
+              child: const Text('Kapat'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -461,12 +486,12 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                 // Try to copy to clipboard
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('تم نسخ الرقم إلى الحافظة'),
+                    content: Text('Numara panoya kopyalandı'),
                     backgroundColor: Colors.green,
                   ),
                 );
               },
-              child: const Text('نسخ الرقم'),
+              child: const Text('Numarayı Kopyala'),
             ),
           ],
         );
