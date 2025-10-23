@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../constants/app_constants.dart';
-import '../models/adoption_pet.dart';
 
 class AddAdoptionPetScreen extends StatefulWidget {
   const AddAdoptionPetScreen({super.key});
@@ -25,6 +26,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
   bool _isVaccinated = false;
   bool _isNeutered = false;
   bool _isLoading = false;
+  File? _selectedImage;
 
   @override
   void dispose() {
@@ -106,6 +108,11 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                     return null;
                   },
                 ),
+
+                const SizedBox(height: AppConstants.mediumPadding),
+
+                // Pet Image
+                _buildImagePickerField(),
 
                 const SizedBox(height: AppConstants.mediumPadding),
 
@@ -407,6 +414,94 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
     );
   }
 
+  Widget _buildImagePickerField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Hayvan Fotoğrafı',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: AppConstants.smallPadding),
+        GestureDetector(
+          onTap: _pickImage,
+          child: Container(
+            width: double.infinity,
+            height: 200,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: _selectedImage != null
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.grey[300]!,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: _selectedImage != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(_selectedImage!, fit: BoxFit.cover),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_photo_alternate_outlined,
+                        size: 50,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Fotoğraf eklemek için dokunun',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+        const SizedBox(height: AppConstants.smallPadding),
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: _pickImage,
+                icon: const Icon(Icons.photo_library, size: 20),
+                label: const Text('Galeriden Seç'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+            if (_selectedImage != null) ...[
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _removeImage,
+                  icon: const Icon(Icons.delete, size: 20),
+                  label: const Text('Kaldır'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildHealthStatusSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,6 +548,50 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
     );
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 80,
+    );
+
+    if (image != null) {
+      setState(() {
+        _selectedImage = File(image.path);
+      });
+    }
+  }
+
+  void _removeImage() {
+    setState(() {
+      _selectedImage = null;
+    });
+  }
+
+  Future<String?> _uploadImageToSupabase() async {
+    if (_selectedImage == null) return null;
+
+    try {
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final filePath = 'adoption-pets/$fileName';
+
+      await Supabase.instance.client.storage
+          .from(AppConstants.petImagesBucket)
+          .upload(filePath, _selectedImage!);
+
+      final imageUrl = Supabase.instance.client.storage
+          .from(AppConstants.petImagesBucket)
+          .getPublicUrl(filePath);
+
+      return imageUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      return null;
+    }
+  }
+
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -470,31 +609,46 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
         return;
       }
 
-      // Create adoption pet object
-      final adoptionPet = AdoptionPet(
-        id: '', // Will be generated by database
-        name: _nameController.text.trim(),
-        type: _selectedType,
-        imageUrl:
-            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400', // Default image
-        description: _descriptionController.text.trim(),
-        city: _selectedCity,
-        contactNumber:
+      // Upload image if selected
+      String imageUrl =
+          'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400'; // Default image
+      if (_selectedImage != null) {
+        final uploadedImageUrl = await _uploadImageToSupabase();
+        if (uploadedImageUrl != null) {
+          imageUrl = uploadedImageUrl;
+        } else {
+          _showErrorSnackBar(
+            'Resim yüklenirken hata oluştu. Lütfen tekrar deneyin.',
+          );
+          return;
+        }
+      }
+
+      // Create adoption pet data map (without id - will be generated by database)
+      final adoptionPetData = {
+        'name': _nameController.text.trim(),
+        'type': _selectedType,
+        'image_url': imageUrl,
+        'description': _descriptionController.text.trim(),
+        'city': _selectedCity,
+        'contact_number':
             '$_selectedCountryCode${_contactNumberController.text.trim()}',
-        whatsappNumber:
+        'whatsapp_number':
             '$_selectedCountryCode${_whatsappNumberController.text.trim()}',
-        age: int.parse(_ageController.text.trim()),
-        gender: _selectedGender,
-        isVaccinated: _isVaccinated,
-        isNeutered: _isNeutered,
-        createdAt: DateTime.now(),
-        userId: user.id,
-      );
+        'age': int.parse(_ageController.text.trim()),
+        'gender': _selectedGender,
+        'is_vaccinated': _isVaccinated,
+        'is_neutered': _isNeutered,
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+        'user_id': user.id,
+        'is_active': true,
+      };
 
       // Insert into database
       await Supabase.instance.client
           .from(AppConstants.adoptionPetsTable)
-          .insert(adoptionPet.toJson())
+          .insert(adoptionPetData)
           .select();
 
       if (mounted) {
