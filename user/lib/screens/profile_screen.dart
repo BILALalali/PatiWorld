@@ -4,6 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
 import '../constants/app_constants.dart';
 import '../services/auth_service.dart';
+import '../services/user_stats_service.dart';
+import '../services/debug_service.dart';
 import '../models/user.dart' as app_user;
 import 'login_screen.dart';
 
@@ -22,16 +24,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   bool _isEditing = false;
   bool _isLoading = false; // Loading state for image upload
+  bool _isLoadingStats = false; // Loading state for statistics
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
   app_user.User? _currentUser; // Current user data
   int _imageUpdateTimestamp = 0; // Track image updates to force refresh
+
+  // Statistics data
+  Map<String, int> _userStats = {
+    'adoption_pets_count': 0,
+    'lost_pets_count': 0,
+    'vaccinations_count': 0,
+    'days_in_app': 0,
+  };
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadUserData();
+      _loadUserStats();
+      // Debug function - call it after a short delay to ensure auth is ready
+      Future.delayed(const Duration(seconds: 2), () {
+        DebugService.debugUserStats();
+      });
     });
   }
 
@@ -82,6 +98,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _nameController.text = user.fullName ?? '';
           _emailController.text = user.email;
           _phoneController.text = user.phoneNumber ?? '';
+        });
+      }
+    }
+  }
+
+  Future<void> _loadUserStats() async {
+    try {
+      setState(() {
+        _isLoadingStats = true;
+      });
+
+      final currentUser = AuthService.currentUser;
+      print('Current user: $currentUser');
+      print('Current user ID: ${currentUser?.id}');
+
+      if (currentUser != null) {
+        print('Loading stats for user ID: ${currentUser.id}');
+
+        // Get the correct user ID (handles cases where auth user ID differs from database user ID)
+        final correctUserId = await UserStatsService.getCorrectUserId();
+        Map<String, int> stats;
+
+        if (correctUserId != null) {
+          print('Using correct user ID: $correctUserId');
+          stats = await UserStatsService.getUserStats(correctUserId);
+          print('Stats loaded: $stats');
+        } else {
+          print('Could not determine correct user ID');
+          // Fallback to current user ID
+          stats = await UserStatsService.getUserStats(currentUser.id);
+          print('Stats loaded with fallback: $stats');
+        }
+
+        if (mounted) {
+          setState(() {
+            _userStats = stats;
+            _isLoadingStats = false;
+          });
+        }
+      } else {
+        print('No current user found');
+        if (mounted) {
+          setState(() {
+            _isLoadingStats = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading user stats: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingStats = false;
         });
       }
     }
@@ -709,57 +777,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Content with pet-themed stats
           Padding(
             padding: const EdgeInsets.all(24),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildPetThemedStatCard(
-                        'Kayıp İlanları',
-                        '2',
-                        Icons.search_rounded,
-                        '🔍',
-                        Colors.blue,
-                      ),
+            child: _isLoadingStats
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: CircularProgressIndicator(),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildPetThemedStatCard(
-                        'Sahiplendirme İlanları',
-                        '1',
-                        Icons.favorite_rounded,
-                        '❤️',
-                        Colors.pink,
+                  )
+                : Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildPetThemedStatCard(
+                              'Kayıp İlanları',
+                              _userStats['lost_pets_count'].toString(),
+                              Icons.search_rounded,
+                              '🔍',
+                              Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildPetThemedStatCard(
+                              'Sahiplendirme İlanları',
+                              _userStats['adoption_pets_count'].toString(),
+                              Icons.favorite_rounded,
+                              '❤️',
+                              Colors.pink,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildPetThemedStatCard(
-                        'Kayıtlı Aşılar',
-                        '3',
-                        Icons.medical_services_rounded,
-                        '💉',
-                        Colors.green,
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildPetThemedStatCard(
+                              'Kayıtlı Aşılar',
+                              _userStats['vaccinations_count'].toString(),
+                              Icons.medical_services_rounded,
+                              '💉',
+                              Colors.green,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildPetThemedStatCard(
+                              'Uygulamada Gün',
+                              _userStats['days_in_app'].toString(),
+                              Icons.calendar_today_rounded,
+                              '📅',
+                              Colors.orange,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildPetThemedStatCard(
-                        'Uygulamada Gün',
-                        '15',
-                        Icons.calendar_today_rounded,
-                        '📅',
-                        Colors.orange,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                    ],
+                  ),
           ),
         ],
       ),
