@@ -428,4 +428,429 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataLoadingError => 'Data loading error';
+
+  @override
+  String get invalidCredentials => 'Invalid email or password';
+
+  @override
+  String get userNotFound => 'User not found';
+
+  @override
+  String get pleaseEnterEmailFirst => 'Please enter your email address first';
+
+  @override
+  String get passwordResetEmailSent =>
+      'Password reset link sent to your email address';
+
+  @override
+  String get animalFriendlyApp => 'Animal Friendly App';
+
+  @override
+  String get enterEmailAddress => 'Enter your email address';
+
+  @override
+  String get pleaseEnterEmail => 'Please enter your email address';
+
+  @override
+  String get pleaseEnterValidEmail => 'Please enter a valid email address';
+
+  @override
+  String get enterPassword => 'Enter your password';
+
+  @override
+  String get pleaseEnterPassword => 'Please enter your password';
+
+  @override
+  String passwordMinLength(int count) {
+    return 'Password must be at least $count characters';
+  }
+
+  @override
+  String get accountInformation => 'Account Information';
+
+  @override
+  String get editPersonalInformation => 'Edit your personal information';
+
+  @override
+  String get fullName => 'Full Name';
+
+  @override
+  String get pleaseEnterFullName => 'Please enter your full name';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get pleaseEnterPhoneNumber => 'Please enter your phone number';
+
+  @override
+  String get phoneNumberMinLength => 'Phone number must be at least 10 digits';
+
+  @override
+  String get yourStatistics => 'Your Statistics';
+
+  @override
+  String get activitySummary => 'Activity summary';
+
+  @override
+  String get lostPetListings => 'Lost Pet Listings';
+
+  @override
+  String get adoptionListings => 'Adoption Listings';
+
+  @override
+  String get registeredVaccinations => 'Registered Vaccinations';
+
+  @override
+  String get daysInApp => 'Days in App';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get changesSavedSuccessfully => 'Changes saved successfully';
+
+  @override
+  String get userInfoNotFound => 'User information not found';
+
+  @override
+  String get errorSavingChanges => 'Error saving changes';
+
+  @override
+  String get confirmLogout => 'Are you sure you want to logout?';
+
+  @override
+  String get errorLoggingOut => 'Error logging out';
+
+  @override
+  String get selectFromGallery => 'Select from Gallery';
+
+  @override
+  String get removeImage => 'Remove Image';
+
+  @override
+  String get vaccinationCalendar => 'Vaccination Calendar';
+
+  @override
+  String get vaccinationStatistics => 'Vaccination Statistics';
+
+  @override
+  String get failedToLoadVaccinations => 'Failed to load vaccinations';
+
+  @override
+  String get noVaccinationsRegistered => 'No vaccinations registered';
+
+  @override
+  String get addVaccinationToTrack => 'Add vaccination to track your pets';
+
+  @override
+  String get expired => 'Expired';
+
+  @override
+  String get soon => 'Soon';
+
+  @override
+  String get planned => 'Planned';
+
+  @override
+  String get vaccine => 'Vaccine';
+
+  @override
+  String get vaccineDate => 'Vaccine Date';
+
+  @override
+  String get nextVaccine => 'Next Vaccine';
+
+  @override
+  String get deleteConfirmation => 'Delete Confirmation';
+
+  @override
+  String confirmDeleteVaccination(String petName) {
+    return 'Are you sure you want to delete $petName\'s vaccination?';
+  }
+
+  @override
+  String get vaccinationDeletedSuccessfully =>
+      'Vaccination deleted successfully';
+
+  @override
+  String get failedToDeleteVaccination => 'Failed to delete vaccination';
+
+  @override
+  String get noLostPetListings => 'No lost pet listings at the moment';
+
+  @override
+  String get addFirstLostPetListing => 'Add the first lost pet listing';
+
+  @override
+  String get lost => 'Lost';
+
+  @override
+  String daysAgo(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String get call => 'Call';
+
+  @override
+  String get whatsapp => 'WhatsApp';
+
+  @override
+  String get whatsappAppCannotBeOpened => 'WhatsApp app cannot be opened';
+
+  @override
+  String get whatsappCannotBeOpened => 'WhatsApp cannot be opened';
+
+  @override
+  String get copyNumberAndCallManually =>
+      'You can copy the number and call manually';
+
+  @override
+  String get numberCopiedToClipboard => 'Number copied to clipboard';
+
+  @override
+  String get copyNumber => 'Copy Number';
+
+  @override
+  String get searchHint => 'Pet name, type, city or description...';
+
+  @override
+  String get petType => 'Pet Type';
+
+  @override
+  String get city => 'City';
+
+  @override
+  String get errorLoadingData => 'Error loading data';
+
+  @override
+  String get noAdoptionListings => 'No adoption listings at the moment';
+
+  @override
+  String get addFirstAdoptionListing => 'Add the first adoption listing';
+
+  @override
+  String get adoption => 'Adoption';
+
+  @override
+  String months(int count) {
+    return '$count Months';
+  }
+
+  @override
+  String get addLostPetListing => 'Add Lost Pet Listing';
+
+  @override
+  String get petName => 'Pet Name';
+
+  @override
+  String get enterPetName => 'Enter pet name';
+
+  @override
+  String get pleaseEnterPetName => 'Please enter pet name';
+
+  @override
+  String get petDescription => 'Pet Description';
+
+  @override
+  String get describePetInDetail =>
+      'Describe the pet in detail (color, size, features, behavior...)';
+
+  @override
+  String get pleaseEnterPetDescription => 'Please enter pet description';
+
+  @override
+  String get lostDate => 'Lost Date';
+
+  @override
+  String get ageInMonths => 'Age (Months)';
+
+  @override
+  String get enterAgeInMonthsOptional => 'Enter age in months (optional)';
+
+  @override
+  String get pleaseEnterValidNumber => 'Please enter a valid number';
+
+  @override
+  String get petPhoto => 'Pet Photo';
+
+  @override
+  String get addPhoto => 'Add Photo';
+
+  @override
+  String get change => 'Change';
+
+  @override
+  String get healthStatus => 'Health Status';
+
+  @override
+  String get whatsappNumber => 'WhatsApp Number';
+
+  @override
+  String get addListing => 'Add Listing';
+
+  @override
+  String get pleaseLogin => 'Please login';
+
+  @override
+  String get imageUploadedSuccessfully => 'Image uploaded successfully!';
+
+  @override
+  String get imageUploadFailed => 'Image upload failed';
+
+  @override
+  String get storageSettings => 'Storage Settings';
+
+  @override
+  String get listingAddedSuccessfully => 'Listing added successfully';
+
+  @override
+  String get errorAddingListing => 'Error adding listing';
+
+  @override
+  String get pleaseSelectValidImageFile =>
+      'Please select a valid image file (JPG, PNG, GIF)';
+
+  @override
+  String get imageSizeMustBeLessThan5MB => 'Image size must be less than 5MB';
+
+  @override
+  String get errorSelectingImage => 'Error selecting image';
+
+  @override
+  String get addAdoptionListing => 'Add Adoption Listing';
+
+  @override
+  String get enterAgeInMonths => 'Enter age in months';
+
+  @override
+  String get pleaseEnterAge => 'Please enter age';
+
+  @override
+  String get tapToAddPhoto => 'Tap to add photo';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get selectLocationFromMap => 'Select Location from Map';
+
+  @override
+  String get locationSelected => 'Location selected';
+
+  @override
+  String get addVaccination => 'Add Vaccination';
+
+  @override
+  String get editVaccination => 'Edit Vaccination';
+
+  @override
+  String get vaccineType => 'Vaccine Type';
+
+  @override
+  String get vaccineNumber => 'Vaccine Number';
+
+  @override
+  String get notesOptional => 'Notes (Optional)';
+
+  @override
+  String get enterAdditionalNotes => 'Enter additional notes';
+
+  @override
+  String get updateVaccination => 'Update Vaccination';
+
+  @override
+  String get nextVaccineInfo => 'Next Vaccine Information';
+
+  @override
+  String get nextVaccineReminderDate => 'Next vaccine reminder date:';
+
+  @override
+  String get nextVaccineNumber => 'Next vaccine number';
+
+  @override
+  String get nextVaccineDate => 'Next Vaccine Date';
+
+  @override
+  String get petDetails => 'Pet Details';
+
+  @override
+  String get careMethod => 'Care Method';
+
+  @override
+  String get importantFeatures => 'Important Features';
+
+  @override
+  String get favoriteFoods => 'Favorite Foods';
+
+  @override
+  String get commonDiseases => 'Common Diseases';
+
+  @override
+  String get cute => 'Cute';
+
+  @override
+  String get clean => 'Clean';
+
+  @override
+  String get independent => 'Independent';
+
+  @override
+  String get loyal => 'Loyal';
+
+  @override
+  String get intelligent => 'Intelligent';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get fish => 'Fish';
+
+  @override
+  String get meat => 'Meat';
+
+  @override
+  String get dryFood => 'Dry Food';
+
+  @override
+  String get vegetables => 'Vegetables';
+
+  @override
+  String get urinaryTractInfection => 'Urinary Tract Infection';
+
+  @override
+  String get kidneyDiseases => 'Kidney Diseases';
+
+  @override
+  String get diabetes => 'Diabetes';
+
+  @override
+  String get rabies => 'Rabies';
+
+  @override
+  String get arthritis => 'Arthritis';
+
+  @override
+  String get heartDiseases => 'Heart Diseases';
+
+  @override
+  String get catsArePopularPets =>
+      'Cats are one of the most popular pets in the world';
+
+  @override
+  String get dogsAreBestFriends =>
+      'Dogs are man\'s best friend and most loyal animals';
+
+  @override
+  String get catCareInstructions =>
+      'Requires regular litter cleaning and vaccinations';
+
+  @override
+  String get dogCareInstructions =>
+      'Requires daily exercise and regular training';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/pet.dart';
 import '../constants/app_constants.dart';
+import '../l10n/app_localizations.dart';
 
 class PetDetailScreen extends StatelessWidget {
   final Pet pet;
@@ -9,6 +10,8 @@ class PetDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(pet.name),
@@ -84,7 +87,7 @@ class PetDetailScreen extends StatelessWidget {
                   // Description
                   _buildSection(
                     context,
-                    'Açıklama',
+                    l10n.description,
                     pet.description,
                     Icons.description,
                   ),
@@ -94,7 +97,7 @@ class PetDetailScreen extends StatelessWidget {
                   // Care Instructions
                   _buildSection(
                     context,
-                    'Bakım Yöntemi',
+                    l10n.careMethod,
                     pet.careInstructions,
                     Icons.healing,
                   ),
@@ -102,17 +105,17 @@ class PetDetailScreen extends StatelessWidget {
                   const SizedBox(height: AppConstants.mediumPadding),
 
                   // Features
-                  _buildFeaturesSection(context),
+                  _buildFeaturesSection(context, l10n),
 
                   const SizedBox(height: AppConstants.mediumPadding),
 
                   // Foods
-                  _buildFoodsSection(context),
+                  _buildFoodsSection(context, l10n),
 
                   const SizedBox(height: AppConstants.mediumPadding),
 
                   // Diseases
-                  _buildDiseasesSection(context),
+                  _buildDiseasesSection(context, l10n),
                 ],
               ),
             ),
@@ -164,7 +167,7 @@ class PetDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturesSection(BuildContext context) {
+  Widget _buildFeaturesSection(BuildContext context, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -177,7 +180,7 @@ class PetDetailScreen extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'Önemli Özellikler',
+              l10n.importantFeatures,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
@@ -217,7 +220,7 @@ class PetDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFoodsSection(BuildContext context) {
+  Widget _buildFoodsSection(BuildContext context, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -230,7 +233,7 @@ class PetDetailScreen extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'Favori Yemekler',
+              l10n.favoriteFoods,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
@@ -264,7 +267,7 @@ class PetDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDiseasesSection(BuildContext context) {
+  Widget _buildDiseasesSection(BuildContext context, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -277,7 +280,7 @@ class PetDetailScreen extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'Yaygın Hastalıklar',
+              l10n.commonDiseases,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,

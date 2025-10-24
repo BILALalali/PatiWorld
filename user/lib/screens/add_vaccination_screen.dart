@@ -4,6 +4,7 @@ import '../constants/app_constants.dart';
 import '../models/vaccination.dart';
 import '../services/vaccination_service.dart';
 import '../services/auth_debug_service.dart';
+import '../l10n/app_localizations.dart';
 
 class AddVaccinationScreen extends StatefulWidget {
   final Vaccination? vaccinationToEdit;
@@ -39,7 +40,6 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
       _selectedPetType = vaccination.petType;
       _selectedVaccineType = vaccination.vaccineName;
       _vaccineDate = vaccination.vaccineDate;
-      // التأكد من أن تاريخ اللقاح التالي ليس في الماضي
       _nextVaccineDate = vaccination.nextVaccineDate.isBefore(DateTime.now())
           ? DateTime.now().add(const Duration(days: 30))
           : vaccination.nextVaccineDate;
@@ -57,10 +57,14 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.vaccinationToEdit != null ? 'Aşı Düzenle' : 'Aşı Ekle',
+          widget.vaccinationToEdit != null
+              ? l10n.editVaccination
+              : l10n.addVaccination,
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
@@ -84,24 +88,21 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Pet Name
                 _buildTextField(
                   controller: _petNameController,
-                  label: 'Hayvan Adı',
-                  hint: 'Hayvan adını girin',
+                  label: l10n.petName,
+                  hint: l10n.enterPetName,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Lütfen hayvan adını girin';
+                      return l10n.pleaseEnterPetName;
                     }
                     return null;
                   },
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Pet Type
                 _buildDropdown(
-                  label: 'Hayvan Türü',
+                  label: l10n.petType,
                   value: _selectedPetType,
                   items: AppConstants.petTypes,
                   onChanged: (value) {
@@ -112,10 +113,8 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Vaccine Type
                 _buildDropdown(
-                  label: 'Aşı Türü',
+                  label: l10n.vaccineType,
                   value: _selectedVaccineType,
                   items: AppConstants.vaccineTypes,
                   onChanged: (value) {
@@ -126,38 +125,26 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Vaccine Date
                 _buildDateField(),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Vaccine Number
                 _buildNumberField(),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Next Vaccine Date
                 _buildNextVaccineDateField(),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Notes
                 _buildTextField(
                   controller: _notesController,
-                  label: 'Notlar (İsteğe Bağlı)',
-                  hint: 'Ek notlar girin',
+                  label: l10n.notesOptional,
+                  hint: l10n.enterAdditionalNotes,
                   maxLines: 3,
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Next Vaccine Info
                 _buildNextVaccineInfo(),
 
                 const SizedBox(height: AppConstants.extraLargePadding),
-
-                // Submit Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -174,8 +161,8 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
                         ? const CircularProgressIndicator(color: Colors.white)
                         : Text(
                             widget.vaccinationToEdit != null
-                                ? 'Aşı Güncelle'
-                                : 'Aşı Ekle',
+                                ? l10n.updateVaccination
+                                : l10n.addVaccination,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -278,11 +265,13 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
   }
 
   Widget _buildDateField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Aşı Tarihi',
+          l10n.vaccineDate,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -318,11 +307,13 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
   }
 
   Widget _buildNumberField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Aşı Numarası',
+          l10n.vaccineNumber,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -387,11 +378,13 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
   }
 
   Widget _buildNextVaccineDateField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Sonraki Aşı Tarihi',
+          l10n.nextVaccineDate,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -427,6 +420,8 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
   }
 
   Widget _buildNextVaccineInfo() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(AppConstants.mediumPadding),
       decoration: BoxDecoration(
@@ -442,7 +437,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
               Icon(Icons.schedule, color: Colors.blue[700], size: 20),
               const SizedBox(width: 8),
               Text(
-                'Sonraki Aşı Bilgileri',
+                l10n.nextVaccineInfo,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.blue[700],
@@ -452,7 +447,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'Sonraki aşı için hatırlatma tarihi:',
+            l10n.nextVaccineReminderDate,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.blue[600]),
@@ -467,7 +462,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'Sonraki aşı numarası: ${_vaccineNumber + 1}',
+            '${l10n.nextVaccineNumber}: ${_vaccineNumber + 1}',
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.blue[600]),
@@ -533,7 +528,9 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
       print('User ID: ${user.id}');
 
       final vaccination = Vaccination(
-        id: widget.vaccinationToEdit?.id ?? '', // Will be generated by database for new vaccinations
+        id:
+            widget.vaccinationToEdit?.id ??
+            '', // Will be generated by database for new vaccinations
         petName: _petNameController.text.trim(),
         petType: _selectedPetType,
         vaccineName: _selectedVaccineType,

@@ -8,8 +8,9 @@ import '../services/user_stats_service.dart';
 import '../services/debug_service.dart';
 import '../models/user.dart' as app_user;
 import 'login_screen.dart';
-import 'settings_screen.dart';
 import '../l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import '../services/language_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -169,12 +170,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-            icon: const Icon(Icons.settings),
+            onPressed: _showLanguageDialog,
+            icon: const Icon(Icons.language),
           ),
           IconButton(
             onPressed: _isEditing ? _saveProfile : _toggleEdit,
@@ -423,6 +420,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
@@ -501,7 +500,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hesap Bilgileri',
+                        l10n.accountInformation,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: Theme.of(context).colorScheme.primary,
@@ -510,7 +509,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Kişisel bilgilerinizi düzenleyin',
+                        l10n.editPersonalInformation,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(
                             context,
@@ -532,14 +531,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 // Full Name
                 _buildPetThemedInfoField(
-                  label: 'Ad Soyad',
+                  label: l10n.fullName,
                   controller: _nameController,
                   icon: Icons.person_rounded,
                   emoji: '👤',
                   enabled: _isEditing,
                   validator: (value) {
                     if (_isEditing && (value == null || value.isEmpty)) {
-                      return 'Lütfen ad soyad giriniz';
+                      return l10n.pleaseEnterFullName;
                     }
                     return null;
                   },
@@ -549,7 +548,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 // Email
                 _buildPetThemedInfoField(
-                  label: 'E-posta',
+                  label: l10n.email,
                   controller: _emailController,
                   icon: Icons.email_rounded,
                   emoji: '📧',
@@ -561,7 +560,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 // Phone Number
                 _buildPetThemedInfoField(
-                  label: 'Telefon Numarası',
+                  label: l10n.phoneNumber,
                   controller: _phoneController,
                   icon: Icons.phone_rounded,
                   emoji: '📱',
@@ -569,10 +568,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   keyboardType: TextInputType.phone,
                   validator: (value) {
                     if (_isEditing && (value == null || value.isEmpty)) {
-                      return 'Lütfen telefon numarası giriniz';
+                      return l10n.pleaseEnterPhoneNumber;
                     }
                     if (_isEditing && value != null && value.length < 10) {
-                      return 'Telefon numarası en az 10 haneli olmalıdır';
+                      return l10n.phoneNumberMinLength;
                     }
                     return null;
                   },
@@ -685,6 +684,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildStatisticsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
@@ -763,7 +764,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'İstatistikleriniz',
+                        l10n.yourStatistics,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: Theme.of(context).colorScheme.primary,
@@ -772,7 +773,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Aktivite özetiniz',
+                        l10n.activitySummary,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(
                             context,
@@ -804,7 +805,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Expanded(
                             child: _buildPetThemedStatCard(
-                              'Kayıp İlanları',
+                              l10n.lostPetListings,
                               _userStats['lost_pets_count'].toString(),
                               Icons.search_rounded,
                               '🔍',
@@ -814,7 +815,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: _buildPetThemedStatCard(
-                              'Sahiplendirme İlanları',
+                              l10n.adoptionListings,
                               _userStats['adoption_pets_count'].toString(),
                               Icons.favorite_rounded,
                               '❤️',
@@ -828,7 +829,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Expanded(
                             child: _buildPetThemedStatCard(
-                              'Kayıtlı Aşılar',
+                              l10n.registeredVaccinations,
                               _userStats['vaccinations_count'].toString(),
                               Icons.medical_services_rounded,
                               '💉',
@@ -838,7 +839,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: _buildPetThemedStatCard(
-                              'Uygulamada Gün',
+                              l10n.daysInApp,
                               _userStats['days_in_app'].toString(),
                               Icons.calendar_today_rounded,
                               '📅',
@@ -926,6 +927,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         SizedBox(
@@ -947,8 +950,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 : Icon(_isEditing ? Icons.save : Icons.edit),
             label: Text(
               _isLoading
-                  ? 'Yükleniyor...'
-                  : (_isEditing ? 'Değişiklikleri Kaydet' : 'Profili Düzenle'),
+                  ? l10n.loading
+                  : (_isEditing ? l10n.saveChanges : l10n.editProfile),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: _isLoading
@@ -968,7 +971,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: OutlinedButton.icon(
             onPressed: _showLogoutDialog,
             icon: const Icon(Icons.logout),
-            label: const Text('Çıkış Yap'),
+            label: Text(l10n.logout),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.red,
               side: const BorderSide(color: Colors.red),
@@ -989,6 +992,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -1029,40 +1034,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _isLoading = false;
         });
 
-        _showSuccessSnackBar('Değişiklikler başarıyla kaydedildi');
+        _showSuccessSnackBar(l10n.changesSavedSuccessfully);
       } else {
         setState(() {
           _isLoading = false;
         });
-        _showErrorSnackBar('Kullanıcı bilgileri bulunamadı');
+        _showErrorSnackBar(l10n.userInfoNotFound);
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      _showErrorSnackBar(
-        'Değişiklikler kaydedilirken hata oluştu: ${e.toString()}',
-      );
+      _showErrorSnackBar('${l10n.errorSavingChanges}: ${e.toString()}');
     }
   }
 
   void _showLogoutDialog() {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Çıkış Yap'),
-        content: const Text('Çıkış yapmak istediğinizden emin misiniz?'),
+        title: Text(l10n.logout),
+        content: Text(l10n.confirmLogout),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('İptal'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _performLogout();
             },
-            child: const Text('Çıkış Yap', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.logout, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -1079,7 +1084,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     } catch (e) {
-      _showErrorSnackBar('Çıkış yapılırken hata oluştu: ${e.toString()}');
+      final l10n = AppLocalizations.of(context)!;
+      _showErrorSnackBar('${l10n.errorLoggingOut}: ${e.toString()}');
     }
   }
 
@@ -1096,6 +1102,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _changeProfileImage() async {
+    final l10n = AppLocalizations.of(context)!;
+
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -1104,7 +1112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Galeriden Seç'),
+                title: Text(l10n.selectFromGallery),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImageFromGallery();
@@ -1114,7 +1122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _selectedImage != null)
                 ListTile(
                   leading: const Icon(Icons.delete),
-                  title: const Text('Resmi Kaldır'),
+                  title: Text(l10n.removeImage),
                   onTap: () {
                     Navigator.of(context).pop();
                     _removeProfileImage();
@@ -1258,5 +1266,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Log error but don't throw - this is not critical
       print('Error deleting old profile image: $e');
     }
+  }
+
+  void _showLanguageDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final languageService = Provider.of<LanguageService>(
+      context,
+      listen: false,
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.selectLanguage),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Text('🇹🇷', style: TextStyle(fontSize: 24)),
+              title: Text(l10n.turkish),
+              trailing: languageService.isTurkish
+                  ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                  : null,
+              onTap: () {
+                languageService.setTurkish();
+                Navigator.of(context).pop();
+              },
+            ),
+            ListTile(
+              leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
+              title: Text(l10n.english),
+              trailing: languageService.isEnglish
+                  ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                  : null,
+              onTap: () {
+                languageService.setEnglish();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
+        ],
+      ),
+    );
   }
 }

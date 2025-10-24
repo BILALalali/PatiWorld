@@ -4,6 +4,7 @@ import '../models/lost_pet.dart';
 import '../constants/app_constants.dart';
 import '../services/lost_pet_service.dart';
 import 'add_lost_pet_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class LostPetsScreen extends StatefulWidget {
   const LostPetsScreen({super.key});
@@ -17,8 +18,8 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   List<LostPet> filteredLostPets = [];
   bool isLoading = true;
   String searchQuery = '';
-  String selectedType = 'Tümü';
-  String selectedCity = 'Tümü';
+  String selectedType = 'All';
+  String selectedCity = 'All';
 
   @override
   void initState() {
@@ -28,22 +29,30 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
 
   Future<void> _loadLostPets() async {
     try {
+      print('Loading lost pets...');
       final pets = await LostPetService.getAllLostPets();
+      print('Loaded ${pets.length} lost pets');
+      for (var pet in pets) {
+        print('Pet: ${pet.name} - ${pet.type} - ${pet.city}');
+      }
       setState(() {
         lostPets = pets;
         _applyFilters();
         isLoading = false;
       });
+      print('Lost pets loaded successfully');
     } catch (e) {
+      print('Error loading lost pets: $e');
       // Error loading lost pets
       setState(() {
         lostPets = [];
         isLoading = false;
       });
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Veriler yüklenirken hata oluştu: ${e.toString()}'),
+            content: Text('${l10n.errorLoadingData}: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -52,6 +61,12 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   }
 
   void _applyFilters() {
+    print('Applying filters...');
+    print('Total lost pets: ${lostPets.length}');
+    print('Search query: "$searchQuery"');
+    print('Selected type: "$selectedType"');
+    print('Selected city: "$selectedCity"');
+
     setState(() {
       filteredLostPets = lostPets.where((pet) {
         // Search filter
@@ -66,39 +81,47 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
         }
 
         // Type filter
-        if (selectedType != 'Tümü' && pet.type != selectedType) {
+        if (selectedType != 'All' && pet.type != selectedType) {
           return false;
         }
 
         // City filter
-        if (selectedCity != 'Tümü' && pet.city != selectedCity) {
+        if (selectedCity != 'All' && pet.city != selectedCity) {
           return false;
         }
 
         return true;
       }).toList();
     });
+
+    print('Filtered lost pets: ${filteredLostPets.length}');
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    print(
+      'Building LostPetsScreen - isLoading: $isLoading, lostPets: ${lostPets.length}, filteredLostPets: ${filteredLostPets.length}',
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kayıp Hayvan İlanları'),
+        title: Text(l10n.lostPetListings),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           if (searchQuery.isNotEmpty ||
-              selectedType != 'Tümü' ||
-              selectedCity != 'Tümü')
+              selectedType != 'All' ||
+              selectedCity != 'All')
             IconButton(
               icon: const Icon(Icons.clear),
               onPressed: () {
                 setState(() {
                   searchQuery = '';
-                  selectedType = 'Tümü';
-                  selectedCity = 'Tümü';
+                  selectedType = 'All';
+                  selectedCity = 'All';
                 });
                 _applyFilters();
               },
@@ -110,12 +133,13 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
           IconButton(
             icon: Icon(
               Icons.filter_list,
-              color: (selectedType != 'Tümü' || selectedCity != 'Tümü')
+              color: (selectedType != 'All' || selectedCity != 'All')
                   ? Colors.yellow
                   : Colors.white,
             ),
             onPressed: _showFilterDialog,
           ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _loadLostPets),
         ],
       ),
       body: isLoading
@@ -125,8 +149,8 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
           : Column(
               children: [
                 if (searchQuery.isNotEmpty ||
-                    selectedType != 'Tümü' ||
-                    selectedCity != 'Tümü')
+                    selectedType != 'All' ||
+                    selectedCity != 'All')
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(AppConstants.smallPadding),
@@ -159,6 +183,12 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
+
+    print(
+      'Building empty state - lostPets: ${lostPets.length}, filteredLostPets: ${filteredLostPets.length}',
+    );
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -166,14 +196,14 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
           Icon(Icons.pets, size: 100, color: Colors.grey[400]),
           const SizedBox(height: AppConstants.mediumPadding),
           Text(
-            'Şu anda kayıp hayvan ilanı bulunmuyor',
+            l10n.noLostPetListings,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'İlk kayıp hayvan ilanını sen ekle',
+            l10n.addFirstLostPetListing,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
@@ -184,6 +214,10 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   }
 
   Widget _buildLostPetsList() {
+    print(
+      'Building lost pets list - filteredLostPets: ${filteredLostPets.length}',
+    );
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -206,6 +240,10 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   }
 
   Widget _buildLostPetCard(LostPet lostPet) {
+    final l10n = AppLocalizations.of(context)!;
+
+    print('Building lost pet card for: ${lostPet.name}');
+
     return Card(
       margin: const EdgeInsets.only(bottom: AppConstants.mediumPadding),
       elevation: AppConstants.cardElevation,
@@ -273,9 +311,9 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                           color: Colors.red.withValues(alpha: 0.3),
                         ),
                       ),
-                      child: const Text(
-                        'Kayıp',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.lost,
+                        style: const TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -337,7 +375,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                     const SizedBox(width: 8),
                     _buildInfoChip(
                       Icons.access_time,
-                      '${lostPet.daysSinceLost} gün önce',
+                      l10n.daysAgo(lostPet.daysSinceLost),
                       Colors.red,
                     ),
                   ],
@@ -351,14 +389,14 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                     children: [
                       if (lostPet.isVaccinated)
                         _buildStatusChip(
-                          'Aşılı',
+                          l10n.vaccinated,
                           lostPet.isVaccinated,
                           Colors.green,
                         ),
                       if (lostPet.isVaccinated) const SizedBox(width: 8),
                       if (lostPet.isNeutered)
                         _buildStatusChip(
-                          'Kısırlaştırılmış',
+                          l10n.neutered,
                           lostPet.isNeutered,
                           Colors.blue,
                         ),
@@ -375,7 +413,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () => _makePhoneCall(lostPet.contactNumber),
                         icon: const Icon(Icons.phone, size: 18),
-                        label: const Text('Ara'),
+                        label: Text(l10n.call),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(
                             context,
@@ -392,7 +430,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () => _openWhatsApp(lostPet.whatsappNumber),
                         icon: const Icon(Icons.message, size: 18),
-                        label: const Text('WhatsApp'),
+                        label: Text(l10n.whatsapp),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
@@ -511,10 +549,12 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
       if (await canLaunchUrl(whatsappUri)) {
         await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
       } else {
-        _showErrorSnackBar('WhatsApp uygulaması açılamadı');
+        final l10n = AppLocalizations.of(context)!;
+        _showErrorSnackBar(l10n.whatsappAppCannotBeOpened);
       }
     } catch (e) {
-      _showErrorSnackBar('WhatsApp açılamadı: ${e.toString()}');
+      final l10n = AppLocalizations.of(context)!;
+      _showErrorSnackBar('${l10n.whatsappCannotBeOpened}: ${e.toString()}');
     }
   }
 
@@ -525,16 +565,18 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   }
 
   void _showPhoneNumberDialog(String phoneNumber) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Telefon Numarası'),
+          title: Text(l10n.phoneNumber),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Telefon Numarası:',
+                '${l10n.phoneNumber}:',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -546,29 +588,29 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Numarayı kopyalayıp manuel olarak arayabilirsiniz',
-                style: TextStyle(color: Colors.grey),
+              Text(
+                l10n.copyNumberAndCallManually,
+                style: const TextStyle(color: Colors.grey),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Kapat'),
+              child: Text(l10n.close),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 // Try to copy to clipboard
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Numara panoya kopyalandı'),
+                  SnackBar(
+                    content: Text(l10n.numberCopiedToClipboard),
                     backgroundColor: Colors.green,
                   ),
                 );
               },
-              child: const Text('Numarayı Kopyala'),
+              child: Text(l10n.copyNumber),
             ),
           ],
         );
@@ -577,14 +619,16 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   }
 
   void _showSearchDialog() {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Arama'),
+        title: Text(l10n.search),
         content: TextField(
-          decoration: const InputDecoration(
-            hintText: 'Hayvan adı, türü, şehir veya açıklama...',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: l10n.searchHint,
+            border: const OutlineInputBorder(),
           ),
           onChanged: (value) {
             setState(() {
@@ -602,14 +646,14 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
               _applyFilters();
               Navigator.pop(context);
             },
-            child: const Text('Temizle'),
+            child: Text(l10n.clear),
           ),
           TextButton(
             onPressed: () {
               _applyFilters();
               Navigator.pop(context);
             },
-            child: const Text('Ara'),
+            child: Text(l10n.search),
           ),
         ],
       ),
@@ -617,21 +661,23 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   }
 
   void _showFilterDialog() {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Filtrele'),
+        title: Text(l10n.filter),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Type Filter
             DropdownButtonFormField<String>(
               value: selectedType,
-              decoration: const InputDecoration(
-                labelText: 'Hayvan Türü',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.petType,
+                border: const OutlineInputBorder(),
               ),
-              items: ['Tümü', ...AppConstants.petTypes].map((type) {
+              items: ['All', ...AppConstants.petTypes].map((type) {
                 return DropdownMenuItem<String>(value: type, child: Text(type));
               }).toList(),
               onChanged: (value) {
@@ -644,11 +690,11 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
             // City Filter
             DropdownButtonFormField<String>(
               value: selectedCity,
-              decoration: const InputDecoration(
-                labelText: 'Şehir',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.city,
+                border: const OutlineInputBorder(),
               ),
-              items: ['Tümü', ...AppConstants.cities].map((city) {
+              items: ['All', ...AppConstants.cities].map((city) {
                 return DropdownMenuItem<String>(value: city, child: Text(city));
               }).toList(),
               onChanged: (value) {
@@ -663,20 +709,20 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
           TextButton(
             onPressed: () {
               setState(() {
-                selectedType = 'Tümü';
-                selectedCity = 'Tümü';
+                selectedType = 'All';
+                selectedCity = 'All';
               });
               _applyFilters();
               Navigator.pop(context);
             },
-            child: const Text('Sıfırla'),
+            child: Text(l10n.reset),
           ),
           TextButton(
             onPressed: () {
               _applyFilters();
               Navigator.pop(context);
             },
-            child: const Text('Uygula'),
+            child: Text(l10n.apply),
           ),
         ],
       ),

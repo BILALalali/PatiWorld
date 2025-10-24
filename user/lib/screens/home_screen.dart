@@ -24,22 +24,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadPets() async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
 
       final petsData = await PetService.getAllPets();
 
-      setState(() {
-        pets = petsData;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-
       if (mounted) {
+        setState(() {
+          pets = petsData;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

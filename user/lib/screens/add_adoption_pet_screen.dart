@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../constants/app_constants.dart';
 import 'location_picker_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class AddAdoptionPetScreen extends StatefulWidget {
   const AddAdoptionPetScreen({super.key});
@@ -23,14 +24,14 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
   String _selectedType = AppConstants.petTypes.first;
   String _selectedCity = AppConstants.cities.first;
   String _selectedGender = AppConstants.genderOptions.first;
-  String _selectedCountryCode = '+90'; // Default to Turkey
+  String _selectedCountryCode = '+90';
   bool _isVaccinated = false;
   bool _isNeutered = false;
   bool _isLoading = false;
   File? _selectedImage;
   double? _selectedLatitude;
   double? _selectedLongitude;
-  String _selectedLocationName = 'Konum seçilmedi';
+  String _selectedLocationName = 'Location not selected';
 
   @override
   void dispose() {
@@ -44,9 +45,11 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sahiplendirme İlanı Ekle'),
+        title: Text(l10n.addAdoptionListing),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -69,24 +72,21 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Pet Name
                 _buildTextField(
                   controller: _nameController,
-                  label: 'Hayvan Adı',
-                  hint: 'Hayvanın adını girin',
+                  label: l10n.petName,
+                  hint: l10n.enterPetName,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Lütfen hayvan adını girin';
+                      return l10n.pleaseEnterPetName;
                     }
                     return null;
                   },
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Pet Type
                 _buildDropdown(
-                  label: 'Hayvan Türü',
+                  label: l10n.petType,
                   value: _selectedType,
                   items: AppConstants.petTypes,
                   onChanged: (value) {
@@ -97,32 +97,25 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Description
                 _buildTextField(
                   controller: _descriptionController,
-                  label: 'Hayvan Açıklaması',
-                  hint:
-                      'Hayvanı detaylı olarak açıklayın (renk, boyut, özellikler, davranış...)',
+                  label: l10n.petDescription,
+                  hint: l10n.describePetInDetail,
                   maxLines: 3,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Lütfen hayvan açıklaması girin';
+                      return l10n.pleaseEnterPetDescription;
                     }
                     return null;
                   },
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Pet Image
                 _buildImagePickerField(),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // City
                 _buildDropdown(
-                  label: 'Şehir',
+                  label: l10n.city,
                   value: _selectedCity,
                   items: AppConstants.cities,
                   onChanged: (value) {
@@ -133,34 +126,28 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Location Picker
                 _buildLocationPickerField(),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Age
                 _buildTextField(
                   controller: _ageController,
-                  label: 'Yaş (Ay)',
-                  hint: 'Yaşını ay olarak girin',
+                  label: l10n.ageInMonths,
+                  hint: l10n.enterAgeInMonths,
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Lütfen yaş girin';
+                      return l10n.pleaseEnterAge;
                     }
                     if (int.tryParse(value) == null) {
-                      return 'Lütfen geçerli bir sayı girin';
+                      return l10n.pleaseEnterValidNumber;
                     }
                     return null;
                   },
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Gender
                 _buildDropdown(
-                  label: 'Cinsiyet',
+                  label: l10n.gender,
                   value: _selectedGender,
                   items: AppConstants.genderOptions,
                   onChanged: (value) {
@@ -171,16 +158,12 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Health Status
                 _buildHealthStatusSection(),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // Contact Number
                 _buildPhoneNumberField(
                   controller: _contactNumberController,
-                  label: 'Telefon Numarası',
+                  label: l10n.phoneNumber,
                   hint: '5xxxxxxxx',
                   selectedCountryCode: _selectedCountryCode,
                   onCountryCodeChanged: (value) {
@@ -191,11 +174,9 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 ),
 
                 const SizedBox(height: AppConstants.mediumPadding),
-
-                // WhatsApp Number
                 _buildPhoneNumberField(
                   controller: _whatsappNumberController,
-                  label: 'WhatsApp Numarası',
+                  label: l10n.whatsappNumber,
                   hint: '5xxxxxxxx',
                   selectedCountryCode: _selectedCountryCode,
                   onCountryCodeChanged: (value) {
@@ -206,8 +187,6 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 ),
 
                 const SizedBox(height: AppConstants.extraLargePadding),
-
-                // Submit Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -222,9 +201,9 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'İlanı Ekle',
-                            style: TextStyle(
+                        : Text(
+                            l10n.addListing,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -334,6 +313,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
     required String selectedCountryCode,
     required void Function(String?) onCountryCodeChanged,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -388,10 +368,10 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Lütfen telefon numarası girin';
+                    return l10n.pleaseEnterPhoneNumber;
                   }
                   if (value.length < 10) {
-                    return 'Telefon numarası en az 10 haneli olmalı';
+                    return l10n.phoneNumberMinLength;
                   }
                   return null;
                 },
@@ -424,11 +404,13 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
   }
 
   Widget _buildImagePickerField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Hayvan Fotoğrafı',
+          l10n.petPhoto,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -464,7 +446,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Fotoğraf eklemek için dokunun',
+                        l10n.tapToAddPhoto,
                         style: TextStyle(color: Colors.grey[600], fontSize: 14),
                       ),
                     ],
@@ -478,7 +460,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
               child: ElevatedButton.icon(
                 onPressed: _pickImage,
                 icon: const Icon(Icons.photo_library, size: 20),
-                label: const Text('Galeriden Seç'),
+                label: Text(l10n.selectFromGallery),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
@@ -494,7 +476,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _removeImage,
                   icon: const Icon(Icons.delete, size: 20),
-                  label: const Text('Kaldır'),
+                  label: Text(l10n.remove),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,
@@ -512,11 +494,13 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
   }
 
   Widget _buildLocationPickerField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Konum',
+          l10n.location,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -563,7 +547,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _pickLocationFromMap,
                   icon: const Icon(Icons.map, size: 18),
-                  label: const Text('Haritadan Konum Seç'),
+                  label: Text(l10n.selectLocationFromMap),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.white,
@@ -598,7 +582,7 @@ class _AddAdoptionPetScreenState extends State<AddAdoptionPetScreen> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Konum seçildi',
+                        l10n.locationSelected,
                         style: TextStyle(
                           color: Colors.green[700],
                           fontSize: 12,

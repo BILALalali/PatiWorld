@@ -4,6 +4,7 @@ import '../constants/app_constants.dart';
 import '../services/vaccination_service.dart';
 import 'add_vaccination_screen.dart';
 import 'vaccination_stats_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class VaccinationScreen extends StatefulWidget {
   const VaccinationScreen({super.key});
@@ -39,15 +40,18 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
       setState(() {
         isLoading = false;
       });
-      _showErrorSnackBar('لقاحات جلب فشل في: $e');
+      final l10n = AppLocalizations.of(context)!;
+      _showErrorSnackBar('${l10n.failedToLoadVaccinations}: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Aşı Takvimi'),
+        title: Text(l10n.vaccinationCalendar),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -62,7 +66,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
               );
             },
             icon: const Icon(Icons.analytics),
-            tooltip: 'إحصائيات اللقاحات',
+            tooltip: l10n.vaccinationStatistics,
           ),
         ],
       ),
@@ -92,6 +96,8 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -103,14 +109,14 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
           ),
           const SizedBox(height: AppConstants.mediumPadding),
           Text(
-            'Kayıtlı aşı bulunmuyor',
+            l10n.noVaccinationsRegistered,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'Evcil hayvanlarınızın aşı takibini yapmak için aşı ekleyin',
+            l10n.addVaccinationToTrack,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
@@ -144,6 +150,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   }
 
   Widget _buildVaccinationCard(Vaccination vaccination) {
+    final l10n = AppLocalizations.of(context)!;
     final isOverdue = vaccination.isVaccineOverdue;
     final daysUntilNext = vaccination.daysUntilNextVaccine;
 
@@ -208,10 +215,10 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                     ),
                     child: Text(
                       isOverdue
-                          ? 'Süresi Doldu'
+                          ? l10n.expired
                           : daysUntilNext <= 7
-                          ? 'Yakında'
-                          : 'Planlandı',
+                          ? l10n.soon
+                          : l10n.planned,
                       style: TextStyle(
                         color: isOverdue
                             ? Colors.red[700]
@@ -246,7 +253,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                     ),
                   ),
                   Text(
-                    'Aşı #${vaccination.vaccineNumber}',
+                    '${l10n.vaccine} #${vaccination.vaccineNumber}',
                     style: Theme.of(
                       context,
                     ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
@@ -261,7 +268,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                 children: [
                   Expanded(
                     child: _buildDateInfo(
-                      'Aşı Tarihi',
+                      l10n.vaccineDate,
                       vaccination.vaccineDate,
                       Icons.event,
                       Colors.blue,
@@ -270,7 +277,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                   const SizedBox(width: AppConstants.mediumPadding),
                   Expanded(
                     child: _buildDateInfo(
-                      'Sonraki Aşı',
+                      l10n.nextVaccine,
                       vaccination.nextVaccineDate,
                       Icons.schedule,
                       isOverdue ? Colors.red : Colors.green,
@@ -309,7 +316,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _editVaccination(vaccination),
                       icon: const Icon(Icons.edit, size: 18),
-                      label: const Text('Düzenle'),
+                      label: Text(l10n.edit),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
@@ -324,7 +331,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _deleteVaccination(vaccination),
                       icon: const Icon(Icons.delete, size: 18),
-                      label: const Text('Sil'),
+                      label: Text(l10n.delete),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
@@ -396,24 +403,24 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   }
 
   void _deleteVaccination(Vaccination vaccination) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Silme Onayı'),
-        content: Text(
-          '${vaccination.petName} aşısını silmek istediğinizden emin misiniz?',
-        ),
+        title: Text(l10n.deleteConfirmation),
+        content: Text(l10n.confirmDeleteVaccination(vaccination.petName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('İptal'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _performDelete(vaccination);
             },
-            child: const Text('Sil', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -421,6 +428,8 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
   }
 
   Future<void> _performDelete(Vaccination vaccination) async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       await VaccinationService.deleteVaccination(vaccination.id);
 
@@ -428,9 +437,9 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
         vaccinations.removeWhere((v) => v.id == vaccination.id);
       });
 
-      _showSuccessSnackBar('تم حذف اللقاح بنجاح');
+      _showSuccessSnackBar(l10n.vaccinationDeletedSuccessfully);
     } catch (e) {
-      _showErrorSnackBar('فشل في حذف اللقاح: $e');
+      _showErrorSnackBar('${l10n.failedToDeleteVaccination}: $e');
     }
   }
 

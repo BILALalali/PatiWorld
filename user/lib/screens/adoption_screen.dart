@@ -5,6 +5,7 @@ import '../models/adoption_pet.dart';
 import '../constants/app_constants.dart';
 import 'add_adoption_pet_screen.dart';
 import 'pet_location_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class AdoptionScreen extends StatefulWidget {
   const AdoptionScreen({super.key});
@@ -31,20 +32,25 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
           .eq('is_active', true)
           .order('created_at', ascending: false);
 
-      setState(() {
-        adoptionPets = (response as List)
-            .map((json) => AdoptionPet.fromJson(json))
-            .toList();
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
       if (mounted) {
+        setState(() {
+          adoptionPets = (response as List)
+              .map((json) => AdoptionPet.fromJson(json))
+              .toList();
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Veriler yüklenirken hata oluştu: ${e.toString()}'),
+            content: Text('${l10n.errorLoadingData}: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -54,9 +60,11 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sahiplendirme İlanları'),
+        title: Text(l10n.adoptionListings),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -82,6 +90,8 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -89,14 +99,14 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
           Icon(Icons.favorite_border, size: 100, color: Colors.grey[400]),
           const SizedBox(height: AppConstants.mediumPadding),
           Text(
-            'Şu anda sahiplendirme ilanı bulunmuyor',
+            l10n.noAdoptionListings,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: AppConstants.smallPadding),
           Text(
-            'İlk sahiplendirme ilanını sen ekle',
+            l10n.addFirstAdoptionListing,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
@@ -129,6 +139,8 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
   }
 
   Widget _buildAdoptionPetCard(AdoptionPet adoptionPet) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.only(bottom: AppConstants.mediumPadding),
       elevation: AppConstants.cardElevation,
@@ -196,7 +208,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                         ),
                       ),
                       child: Text(
-                        'Sahiplendirme',
+                        l10n.adoption,
                         style: TextStyle(
                           color: Colors.blue[700],
                           fontWeight: FontWeight.bold,
@@ -226,7 +238,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                   children: [
                     _buildInfoChip(
                       Icons.cake,
-                      '${adoptionPet.age} Ay',
+                      l10n.months(adoptionPet.age),
                       Colors.orange,
                     ),
                     const SizedBox(width: 8),
@@ -250,13 +262,13 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                 Row(
                   children: [
                     _buildStatusChip(
-                      'Aşılı',
+                      l10n.vaccinated,
                       adoptionPet.isVaccinated,
                       Colors.green,
                     ),
                     const SizedBox(width: 8),
                     _buildStatusChip(
-                      'Kısırlaştırılmış',
+                      l10n.neutered,
                       adoptionPet.isNeutered,
                       Colors.blue,
                     ),
@@ -273,7 +285,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                         onPressed: () =>
                             _makePhoneCall(adoptionPet.contactNumber),
                         icon: const Icon(Icons.phone, size: 18),
-                        label: const Text('Ara'),
+                        label: Text(l10n.call),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(
                             context,
@@ -291,7 +303,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                         onPressed: () =>
                             _openWhatsApp(adoptionPet.whatsappNumber),
                         icon: const Icon(Icons.message, size: 18),
-                        label: const Text('WhatsApp'),
+                        label: Text(l10n.whatsapp),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
@@ -306,7 +318,7 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () => _showPetLocation(adoptionPet),
                         icon: const Icon(Icons.location_on, size: 18),
-                        label: const Text('Konum'),
+                        label: Text(l10n.location),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.teal,
                           foregroundColor: Colors.white,
@@ -425,10 +437,16 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
       if (await canLaunchUrl(whatsappUri)) {
         await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
       } else {
-        _showErrorSnackBar('WhatsApp uygulaması açılamadı');
+        if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
+          _showErrorSnackBar(l10n.whatsappAppCannotBeOpened);
+        }
       }
     } catch (e) {
-      _showErrorSnackBar('WhatsApp açılamadı: ${e.toString()}');
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        _showErrorSnackBar('${l10n.whatsappCannotBeOpened}: ${e.toString()}');
+      }
     }
   }
 
@@ -448,16 +466,18 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
   }
 
   void _showPhoneNumberDialog(String phoneNumber) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Telefon Numarası'),
+          title: Text(l10n.phoneNumber),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Telefon Numarası:',
+                '${l10n.phoneNumber}:',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -469,29 +489,29 @@ class _AdoptionScreenState extends State<AdoptionScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Numarayı kopyalayıp manuel olarak arayabilirsiniz',
-                style: TextStyle(color: Colors.grey),
+              Text(
+                l10n.copyNumberAndCallManually,
+                style: const TextStyle(color: Colors.grey),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Kapat'),
+              child: Text(l10n.close),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 // Try to copy to clipboard
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Numara panoya kopyalandı'),
+                  SnackBar(
+                    content: Text(l10n.numberCopiedToClipboard),
                     backgroundColor: Colors.green,
                   ),
                 );
               },
-              child: const Text('Numarayı Kopyala'),
+              child: Text(l10n.copyNumber),
             ),
           ],
         );

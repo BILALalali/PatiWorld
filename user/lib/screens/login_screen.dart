@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../constants/app_constants.dart';
 import 'register_screen.dart';
 import 'main_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -48,13 +49,14 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         String errorMessage = e.toString().replaceFirst('Exception: ', '');
         if (errorMessage.contains('Invalid login credentials')) {
-          errorMessage = 'Geçersiz e-posta veya şifre';
+          errorMessage = l10n.invalidCredentials;
         } else if (errorMessage.contains('User not found')) {
-          errorMessage = 'Kullanıcı bulunamadı';
+          errorMessage = l10n.userNotFound;
         } else if (errorMessage.contains('Invalid email')) {
-          errorMessage = 'Geçersiz e-posta adresi';
+          errorMessage = l10n.invalidEmail;
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -75,11 +77,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _resetPassword() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Lütfen önce e-posta adresinizi girin'),
-          backgroundColor: Color(AppConstants.warningColor),
+        SnackBar(
+          content: Text(l10n.pleaseEnterEmailFirst),
+          backgroundColor: const Color(AppConstants.warningColor),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -90,11 +94,9 @@ class _LoginScreenState extends State<LoginScreen> {
       await AuthService.resetPassword(_emailController.text.trim());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi',
-            ),
-            backgroundColor: Color(AppConstants.infoColor),
+          SnackBar(
+            content: Text(l10n.passwordResetEmailSent),
+            backgroundColor: const Color(AppConstants.infoColor),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -114,6 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -145,9 +149,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text(
-                      'PatiWorld\'e Hoş Geldiniz',
-                      style: TextStyle(
+                    Text(
+                      l10n.welcome,
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: Color(AppConstants.primaryColor),
@@ -155,9 +159,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Hayvan Dostu Uygulama',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    Text(
+                      l10n.animalFriendlyApp,
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -171,8 +175,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
-                    labelText: 'E-posta',
-                    hintText: 'E-posta adresinizi girin',
+                    labelText: l10n.email,
+                    hintText: l10n.enterEmailAddress,
                     prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
@@ -196,12 +200,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Lütfen e-posta adresinizi girin';
+                      return l10n.pleaseEnterEmail;
                     }
                     if (!RegExp(
                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                     ).hasMatch(value)) {
-                      return 'Lütfen geçerli bir e-posta adresi girin';
+                      return l10n.pleaseEnterValidEmail;
                     }
                     return null;
                   },
@@ -216,8 +220,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _login(),
                   decoration: InputDecoration(
-                    labelText: 'Şifre',
-                    hintText: 'Şifrenizi girin',
+                    labelText: l10n.password,
+                    hintText: l10n.enterPassword,
                     prefixIcon: const Icon(Icons.lock_outlined),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -253,10 +257,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Lütfen şifrenizi girin';
+                      return l10n.pleaseEnterPassword;
                     }
                     if (value.length < AppConstants.minPasswordLength) {
-                      return 'Şifre en az ${AppConstants.minPasswordLength} karakter olmalıdır';
+                      return l10n.passwordMinLength(
+                        AppConstants.minPasswordLength,
+                      );
                     }
                     return null;
                   },
@@ -269,9 +275,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   alignment: Alignment.centerLeft,
                   child: TextButton(
                     onPressed: _resetPassword,
-                    child: const Text(
-                      'Şifremi Unuttum?',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.forgotPassword,
+                      style: const TextStyle(
                         color: Color(AppConstants.primaryColor),
                         fontWeight: FontWeight.w600,
                       ),
@@ -306,9 +312,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         )
-                      : const Text(
-                          'Giriş Yap',
-                          style: TextStyle(
+                      : Text(
+                          l10n.login,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -321,9 +327,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Hesabınız yok mu? ',
-                      style: TextStyle(color: Colors.grey),
+                    Text(
+                      l10n.dontHaveAccount,
+                      style: const TextStyle(color: Colors.grey),
                     ),
                     TextButton(
                       onPressed: () {
@@ -333,9 +339,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       },
-                      child: const Text(
-                        'Yeni Hesap Oluştur',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.signUp,
+                        style: const TextStyle(
                           color: Color(AppConstants.primaryColor),
                           fontWeight: FontWeight.w600,
                         ),
