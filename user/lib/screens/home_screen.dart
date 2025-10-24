@@ -3,6 +3,7 @@ import '../models/pet.dart';
 import '../constants/app_constants.dart';
 import '../services/pet_service.dart';
 import 'pet_detail_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,9 +40,10 @@ class _HomeScreenState extends State<HomeScreen> {
       });
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Veri yükleme hatası: $e'),
+            content: Text('${l10n.dataLoadingError}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -51,6 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -84,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       children: [
                         Text(
-                          'Evcil Hayvan Dünyasına Hoş Geldiniz',
+                          l10n.welcome,
                           style: Theme.of(context).textTheme.headlineSmall
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -94,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: AppConstants.smallPadding),
                         Text(
-                          'Evcil hayvanlarınızın bakımı hakkında faydalı bilgiler keşfedin',
+                          l10n.welcomeSubtitle,
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(color: Colors.grey[600]),
                           textAlign: TextAlign.center,
@@ -111,19 +115,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           horizontal: AppConstants.mediumPadding,
                         ),
                         child: pets.isEmpty
-                            ? const Center(
+                            ? Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.pets,
                                       size: 64,
                                       color: Colors.grey,
                                     ),
-                                    SizedBox(height: 16),
+                                    const SizedBox(height: 16),
                                     Text(
-                                      'Şu anda mevcut hayvan yok',
-                                      style: TextStyle(
+                                      l10n.noPetsAvailable,
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         color: Colors.grey,
                                       ),

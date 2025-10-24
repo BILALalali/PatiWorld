@@ -5,6 +5,7 @@ import 'lost_pets_screen.dart';
 import 'adoption_screen.dart';
 import 'vaccination_screen.dart';
 import 'profile_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -26,13 +27,18 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: _buildBottomNavigationBar(context),
+      bottomNavigationBar: _buildBottomNavigationBar(context, l10n),
     );
   }
 
-  Widget _buildBottomNavigationBar(BuildContext context) {
+  Widget _buildBottomNavigationBar(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     return Container(
       height: 85,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -66,29 +72,29 @@ class _MainScreenState extends State<MainScreen> {
             context,
             1,
             Icons.pets,
-            'Kayıp',
+            l10n.petLost,
             false,
           ), // Changed to pets icon for lost pets
           _buildNavItem(
             context,
             2,
             'assets/icons/heart_smile.svg',
-            'Sahiplendir',
+            l10n.petAdoption,
             false,
           ), // Custom heart smile icon for adoption
-          _buildNavItem(context, 0, Icons.home, 'Ana Sayfa', true),
+          _buildNavItem(context, 0, Icons.home, l10n.home, true),
           _buildNavItem(
             context,
             3,
             'assets/icons/vaccine_calendar.svg',
-            'Aşılar',
+            l10n.veterinaryServices,
             false,
           ),
           _buildNavItem(
             context,
             4,
             'assets/icons/profile_circle.svg',
-            'Profilim',
+            l10n.profile,
             false,
           ),
         ],

@@ -8,6 +8,8 @@ import '../services/user_stats_service.dart';
 import '../services/debug_service.dart';
 import '../models/user.dart' as app_user;
 import 'login_screen.dart';
+import 'settings_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -157,13 +159,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profilim'),
+        title: Text(l10n.profile),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+            icon: const Icon(Icons.settings),
+          ),
           IconButton(
             onPressed: _isEditing ? _saveProfile : _toggleEdit,
             icon: Icon(_isEditing ? Icons.save : Icons.edit),
@@ -213,6 +225,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileImageSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Stack(
@@ -376,7 +390,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 20),
         // Name without emoji
         Text(
-          _nameController.text.isNotEmpty ? _nameController.text : 'Kullanıcı',
+          _nameController.text.isNotEmpty ? _nameController.text : l10n.profile,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.primary,
@@ -397,7 +411,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           child: Text(
-            'PatiWorld Üyesi',
+            'PatiWorld ${l10n.profile}',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.w500,

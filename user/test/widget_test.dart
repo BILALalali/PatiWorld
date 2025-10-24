@@ -9,11 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../lib/main.dart';
+import '../lib/services/language_service.dart';
 
 void main() {
   testWidgets('PatiWorld app smoke test', (WidgetTester tester) async {
+    // Create a mock language service for testing
+    final languageService = LanguageService();
+    await languageService.initialize();
+
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const PatiWorldApp());
+    await tester.pumpWidget(PatiWorldApp(languageService: languageService));
 
     // Wait for the app to load
     await tester.pumpAndSettle();
