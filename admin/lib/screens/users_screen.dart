@@ -39,7 +39,9 @@ class _UsersScreenState extends State<UsersScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('فشل تحميل المستخدمين: ${e.toString()}'),
+            content: Text(
+              'Kullanıcılar yüklenirken hata oluştu: ${e.toString()}',
+            ),
             backgroundColor: Color(AppConstants.errorColor),
           ),
         );
@@ -55,8 +57,8 @@ class _UsersScreenState extends State<UsersScreen> {
           SnackBar(
             content: Text(
               user.isActive
-                  ? 'تم تعطيل المستخدم بنجاح'
-                  : 'تم تفعيل المستخدم بنجاح',
+                  ? 'Kullanıcı başarıyla devre dışı bırakıldı'
+                  : 'Kullanıcı başarıyla etkinleştirildi',
             ),
             backgroundColor: Colors.green,
           ),
@@ -67,7 +69,9 @@ class _UsersScreenState extends State<UsersScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('فشل تحديث حالة المستخدم: ${e.toString()}'),
+            content: Text(
+              'Kullanıcı durumu güncellenirken hata oluştu: ${e.toString()}',
+            ),
             backgroundColor: Color(AppConstants.errorColor),
           ),
         );
@@ -79,19 +83,21 @@ class _UsersScreenState extends State<UsersScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف المستخدم'),
-        content: Text('هل أنت متأكد من حذف المستخدم ${user.email}؟'),
+        title: const Text('Kullanıcıyı Sil'),
+        content: Text(
+          '${user.email} adlı kullanıcıyı silmek istediğinizden emin misiniz?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('إلغاء'),
+            child: const Text('İptal'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: Color(AppConstants.errorColor),
             ),
-            child: const Text('حذف'),
+            child: const Text('Sil'),
           ),
         ],
       ),
@@ -103,7 +109,7 @@ class _UsersScreenState extends State<UsersScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('تم حذف المستخدم بنجاح'),
+              content: Text('Kullanıcı başarıyla silindi'),
               backgroundColor: Colors.green,
             ),
           );
@@ -113,7 +119,9 @@ class _UsersScreenState extends State<UsersScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('فشل حذف المستخدم: ${e.toString()}'),
+              content: Text(
+                'Kullanıcı silinirken hata oluştu: ${e.toString()}',
+              ),
               backgroundColor: Color(AppConstants.errorColor),
             ),
           );
@@ -135,7 +143,7 @@ class _UsersScreenState extends State<UsersScreen> {
                   Icon(Icons.people, size: 64, color: Colors.grey[400]),
                   const SizedBox(height: AppConstants.mediumPadding),
                   Text(
-                    'لا يوجد مستخدمين',
+                    'Kullanıcı bulunmuyor',
                     style: TextStyle(
                       fontSize: AppConstants.subtitleFontSize,
                       color: Colors.grey[600],
@@ -183,11 +191,11 @@ class _UsersScreenState extends State<UsersScreen> {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('البريد: ${user.email}'),
+                          Text('E-posta: ${user.email}'),
                           if (user.phoneNumber != null)
-                            Text('الهاتف: ${user.phoneNumber}'),
+                            Text('Telefon: ${user.phoneNumber}'),
                           Text(
-                            'الحالة: ${user.isActive ? "نشط" : "معطل"}',
+                            'Durum: ${user.isActive ? "Aktif" : "Pasif"}',
                             style: TextStyle(
                               color: user.isActive ? Colors.green : Colors.red,
                             ),
@@ -205,12 +213,14 @@ class _UsersScreenState extends State<UsersScreen> {
                                   : Colors.green,
                             ),
                             onPressed: () => _toggleUserActive(user),
-                            tooltip: user.isActive ? 'تعطيل' : 'تفعيل',
+                            tooltip: user.isActive
+                                ? 'Devre Dışı Bırak'
+                                : 'Etkinleştir',
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () => _deleteUser(user),
-                            tooltip: 'حذف',
+                            tooltip: 'Sil',
                           ),
                         ],
                       ),

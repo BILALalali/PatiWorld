@@ -20,7 +20,9 @@ class AdminService {
           .map((json) => LostPet.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw Exception('فشل جلب إعلانات المفقودات: ${e.toString()}');
+      throw Exception(
+        'Kayıp hayvan ilanları getirilirken hata oluştu: ${e.toString()}',
+      );
     }
   }
 
@@ -28,7 +30,9 @@ class AdminService {
     try {
       await _supabase.from(AppConstants.lostPetsTable).delete().eq('id', id);
     } catch (e) {
-      throw Exception('فشل حذف إعلان المفقودات: ${e.toString()}');
+      throw Exception(
+        'Kayıp hayvan ilanı silinirken hata oluştu: ${e.toString()}',
+      );
     }
   }
 
@@ -44,7 +48,9 @@ class AdminService {
           .map((json) => AdoptionPet.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw Exception('فشل جلب إعلانات التبني: ${e.toString()}');
+      throw Exception(
+        'Sahiplendirme ilanları getirilirken hata oluştu: ${e.toString()}',
+      );
     }
   }
 
@@ -55,7 +61,9 @@ class AdminService {
           .delete()
           .eq('id', id);
     } catch (e) {
-      throw Exception('فشل حذف إعلان التبني: ${e.toString()}');
+      throw Exception(
+        'Sahiplendirme ilanı silinirken hata oluştu: ${e.toString()}',
+      );
     }
   }
 
@@ -71,7 +79,7 @@ class AdminService {
           .map((json) => app_user.User.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw Exception('فشل جلب المستخدمين: ${e.toString()}');
+      throw Exception('Kullanıcılar getirilirken hata oluştu: ${e.toString()}');
     }
   }
 
@@ -82,7 +90,9 @@ class AdminService {
           .update({'is_active': isActive})
           .eq('id', userId);
     } catch (e) {
-      throw Exception('فشل تحديث حالة المستخدم: ${e.toString()}');
+      throw Exception(
+        'Kullanıcı durumu güncellenirken hata oluştu: ${e.toString()}',
+      );
     }
   }
 
@@ -90,7 +100,7 @@ class AdminService {
     try {
       await _supabase.from(AppConstants.usersTable).delete().eq('id', userId);
     } catch (e) {
-      throw Exception('فشل حذف المستخدم: ${e.toString()}');
+      throw Exception('Kullanıcı silinirken hata oluştu: ${e.toString()}');
     }
   }
 
@@ -106,7 +116,9 @@ class AdminService {
           .map((json) => Vaccination.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw Exception('فشل جلب سجلات اللقاحات: ${e.toString()}');
+      throw Exception(
+        'Aşı kayıtları getirilirken hata oluştu: ${e.toString()}',
+      );
     }
   }
 
@@ -117,7 +129,7 @@ class AdminService {
           .delete()
           .eq('id', id);
     } catch (e) {
-      throw Exception('فشل حذف سجل اللقاح: ${e.toString()}');
+      throw Exception('Aşı kaydı silinirken hata oluştu: ${e.toString()}');
     }
   }
 
@@ -167,7 +179,9 @@ class AdminService {
         'totalVaccinationsFromStats': totalVaccinations,
       };
     } catch (e) {
-      throw Exception('فشل جلب الإحصائيات: ${e.toString()}');
+      throw Exception(
+        'İstatistikler getirilirken hata oluştu: ${e.toString()}',
+      );
     }
   }
 }

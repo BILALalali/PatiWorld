@@ -1,45 +1,69 @@
 class LostPet {
   final String id;
   final String userId;
-  final String petName;
-  final String petType;
-  final String? description;
+  final String name;
+  final String type;
+  final String description;
+  final String city;
+  final DateTime lostDate;
+  final String contactNumber;
+  final String whatsappNumber;
   final String? imageUrl;
-  final String? location;
-  final DateTime? lostDate;
-  final String? contactInfo;
+  final int? ageMonths;
+  final String? gender;
+  final bool isVaccinated;
+  final bool isNeutered;
+  final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
 
   LostPet({
     required this.id,
     required this.userId,
-    required this.petName,
-    required this.petType,
-    this.description,
+    required this.name,
+    required this.type,
+    required this.description,
+    required this.city,
+    required this.lostDate,
+    required this.contactNumber,
+    required this.whatsappNumber,
     this.imageUrl,
-    this.location,
-    this.lostDate,
-    this.contactInfo,
+    this.ageMonths,
+    this.gender,
+    this.isVaccinated = false,
+    this.isNeutered = false,
+    this.isActive = true,
     required this.createdAt,
     required this.updatedAt,
   });
 
   factory LostPet.fromJson(Map<String, dynamic> json) {
     return LostPet(
-      id: json['id'] as String,
-      userId: json['user_id'] as String,
-      petName: json['pet_name'] as String,
-      petType: json['pet_type'] as String,
-      description: json['description'] as String?,
-      imageUrl: json['image_url'] as String?,
-      location: json['location'] as String?,
+      id: json['id']?.toString() ?? '',
+      userId: json['user_id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      type: json['type']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      city: json['city']?.toString() ?? '',
       lostDate: json['lost_date'] != null
-          ? DateTime.parse(json['lost_date'] as String)
+          ? DateTime.parse(json['lost_date'].toString())
+          : DateTime.now(),
+      contactNumber: json['contact_number']?.toString() ?? '',
+      whatsappNumber: json['whatsapp_number']?.toString() ?? '',
+      imageUrl: json['image_url']?.toString(),
+      ageMonths: json['age_months'] != null
+          ? int.tryParse(json['age_months'].toString())
           : null,
-      contactInfo: json['contact_info'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      gender: json['gender']?.toString(),
+      isVaccinated: json['is_vaccinated'] as bool? ?? false,
+      isNeutered: json['is_neutered'] as bool? ?? false,
+      isActive: json['is_active'] as bool? ?? true,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'].toString())
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'].toString())
+          : DateTime.now(),
     );
   }
 
@@ -47,13 +71,19 @@ class LostPet {
     return {
       'id': id,
       'user_id': userId,
-      'pet_name': petName,
-      'pet_type': petType,
+      'name': name,
+      'type': type,
       'description': description,
+      'city': city,
+      'lost_date': lostDate.toIso8601String().split('T')[0],
+      'contact_number': contactNumber,
+      'whatsapp_number': whatsappNumber,
       'image_url': imageUrl,
-      'location': location,
-      'lost_date': lostDate?.toIso8601String(),
-      'contact_info': contactInfo,
+      'age_months': ageMonths,
+      'gender': gender,
+      'is_vaccinated': isVaccinated,
+      'is_neutered': isNeutered,
+      'is_active': isActive,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };

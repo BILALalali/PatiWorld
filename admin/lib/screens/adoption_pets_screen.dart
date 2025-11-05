@@ -39,7 +39,7 @@ class _AdoptionPetsScreenState extends State<AdoptionPetsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('فشل تحميل الإعلانات: ${e.toString()}'),
+            content: Text('İlanlar yüklenirken hata oluştu: ${e.toString()}'),
             backgroundColor: Color(AppConstants.errorColor),
           ),
         );
@@ -51,19 +51,21 @@ class _AdoptionPetsScreenState extends State<AdoptionPetsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الإعلان'),
-        content: Text('هل أنت متأكد من حذف إعلان ${adoptionPet.petName}؟'),
+        title: const Text('İlanı Sil'),
+        content: Text(
+          '${adoptionPet.name} adlı ilanı silmek istediğinizden emin misiniz?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('إلغاء'),
+            child: const Text('İptal'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: Color(AppConstants.errorColor),
             ),
-            child: const Text('حذف'),
+            child: const Text('Sil'),
           ),
         ],
       ),
@@ -75,7 +77,7 @@ class _AdoptionPetsScreenState extends State<AdoptionPetsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('تم حذف الإعلان بنجاح'),
+              content: Text('İlan başarıyla silindi'),
               backgroundColor: Colors.green,
             ),
           );
@@ -85,7 +87,7 @@ class _AdoptionPetsScreenState extends State<AdoptionPetsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('فشل حذف الإعلان: ${e.toString()}'),
+              content: Text('İlan silinirken hata oluştu: ${e.toString()}'),
               backgroundColor: Color(AppConstants.errorColor),
             ),
           );
@@ -107,7 +109,7 @@ class _AdoptionPetsScreenState extends State<AdoptionPetsScreen> {
                   Icon(Icons.favorite, size: 64, color: Colors.grey[400]),
                   const SizedBox(height: AppConstants.mediumPadding),
                   Text(
-                    'لا توجد إعلانات تبني',
+                    'Sahiplendirme ilanı bulunmuyor',
                     style: TextStyle(
                       fontSize: AppConstants.subtitleFontSize,
                       color: Colors.grey[600],
@@ -128,13 +130,13 @@ class _AdoptionPetsScreenState extends State<AdoptionPetsScreen> {
                       bottom: AppConstants.mediumPadding,
                     ),
                     child: ListTile(
-                      leading: adoptionPet.imageUrl != null
+                      leading: adoptionPet.imageUrl.isNotEmpty
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(
                                 AppConstants.smallRadius,
                               ),
                               child: CachedNetworkImage(
-                                imageUrl: adoptionPet.imageUrl!,
+                                imageUrl: adoptionPet.imageUrl,
                                 width: 60,
                                 height: 60,
                                 fit: BoxFit.cover,
@@ -149,25 +151,24 @@ class _AdoptionPetsScreenState extends State<AdoptionPetsScreen> {
                             )
                           : const Icon(Icons.favorite, size: 60),
                       title: Text(
-                        adoptionPet.petName,
+                        adoptionPet.name,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('النوع: ${adoptionPet.petType}'),
-                          if (adoptionPet.age != null)
-                            Text('العمر: ${adoptionPet.age}'),
-                          if (adoptionPet.gender != null)
-                            Text('الجنس: ${adoptionPet.gender}'),
-                          if (adoptionPet.location != null)
-                            Text('الموقع: ${adoptionPet.location}'),
+                          Text('Tür: ${adoptionPet.type}'),
+                          Text('Şehir: ${adoptionPet.city}'),
+                          Text('Yaş: ${adoptionPet.age} ay'),
+                          Text('Cinsiyet: ${adoptionPet.gender}'),
+                          if (adoptionPet.contactNumber.isNotEmpty)
+                            Text('İletişim: ${adoptionPet.contactNumber}'),
                         ],
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () => _deleteAdoptionPet(adoptionPet),
-                        tooltip: 'حذف',
+                        tooltip: 'Sil',
                       ),
                       isThreeLine: true,
                     ),

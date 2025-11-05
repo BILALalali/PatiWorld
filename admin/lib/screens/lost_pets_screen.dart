@@ -39,7 +39,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('فشل تحميل الإعلانات: ${e.toString()}'),
+            content: Text('İlanlar yüklenirken hata oluştu: ${e.toString()}'),
             backgroundColor: Color(AppConstants.errorColor),
           ),
         );
@@ -51,19 +51,21 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الإعلان'),
-        content: Text('هل أنت متأكد من حذف إعلان ${lostPet.petName}؟'),
+        title: const Text('İlanı Sil'),
+        content: Text(
+          '${lostPet.name} adlı ilanı silmek istediğinizden emin misiniz?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('إلغاء'),
+            child: const Text('İptal'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: Color(AppConstants.errorColor),
             ),
-            child: const Text('حذف'),
+            child: const Text('Sil'),
           ),
         ],
       ),
@@ -75,7 +77,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('تم حذف الإعلان بنجاح'),
+              content: Text('İlan başarıyla silindi'),
               backgroundColor: Colors.green,
             ),
           );
@@ -85,7 +87,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('فشل حذف الإعلان: ${e.toString()}'),
+              content: Text('İlan silinirken hata oluştu: ${e.toString()}'),
               backgroundColor: Color(AppConstants.errorColor),
             ),
           );
@@ -107,7 +109,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                   Icon(Icons.pets, size: 64, color: Colors.grey[400]),
                   const SizedBox(height: AppConstants.mediumPadding),
                   Text(
-                    'لا توجد إعلانات مفقودات',
+                    'Kayıp hayvan ilanı bulunmuyor',
                     style: TextStyle(
                       fontSize: AppConstants.subtitleFontSize,
                       color: Colors.grey[600],
@@ -149,25 +151,25 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                             )
                           : const Icon(Icons.pets, size: 60),
                       title: Text(
-                        lostPet.petName,
+                        lostPet.name,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('النوع: ${lostPet.petType}'),
-                          if (lostPet.location != null)
-                            Text('الموقع: ${lostPet.location}'),
-                          if (lostPet.lostDate != null)
-                            Text(
-                              'تاريخ الفقدان: ${_formatDate(lostPet.lostDate!)}',
-                            ),
+                          Text('Tür: ${lostPet.type}'),
+                          Text('Şehir: ${lostPet.city}'),
+                          Text(
+                            'Kayıp Tarihi: ${_formatDate(lostPet.lostDate)}',
+                          ),
+                          if (lostPet.contactNumber.isNotEmpty)
+                            Text('İletişim: ${lostPet.contactNumber}'),
                         ],
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () => _deleteLostPet(lostPet),
-                        tooltip: 'حذف',
+                        tooltip: 'Sil',
                       ),
                       isThreeLine: true,
                     ),

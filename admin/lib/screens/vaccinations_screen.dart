@@ -38,7 +38,9 @@ class _VaccinationsScreenState extends State<VaccinationsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('فشل تحميل سجلات اللقاحات: ${e.toString()}'),
+            content: Text(
+              'Aşı kayıtları yüklenirken hata oluştu: ${e.toString()}',
+            ),
             backgroundColor: Color(AppConstants.errorColor),
           ),
         );
@@ -50,19 +52,21 @@ class _VaccinationsScreenState extends State<VaccinationsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف السجل'),
-        content: Text('هل أنت متأكد من حذف سجل لقاح ${vaccination.petName}؟'),
+        title: const Text('Kaydı Sil'),
+        content: Text(
+          '${vaccination.petName} adlı aşı kaydını silmek istediğinizden emin misiniz?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('إلغاء'),
+            child: const Text('İptal'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: Color(AppConstants.errorColor),
             ),
-            child: const Text('حذف'),
+            child: const Text('Sil'),
           ),
         ],
       ),
@@ -74,7 +78,7 @@ class _VaccinationsScreenState extends State<VaccinationsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('تم حذف السجل بنجاح'),
+              content: Text('Kayıt başarıyla silindi'),
               backgroundColor: Colors.green,
             ),
           );
@@ -84,7 +88,7 @@ class _VaccinationsScreenState extends State<VaccinationsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('فشل حذف السجل: ${e.toString()}'),
+              content: Text('Kayıt silinirken hata oluştu: ${e.toString()}'),
               backgroundColor: Color(AppConstants.errorColor),
             ),
           );
@@ -110,7 +114,7 @@ class _VaccinationsScreenState extends State<VaccinationsScreen> {
                   ),
                   const SizedBox(height: AppConstants.mediumPadding),
                   Text(
-                    'لا توجد سجلات لقاحات',
+                    'Aşı kaydı bulunmuyor',
                     style: TextStyle(
                       fontSize: AppConstants.subtitleFontSize,
                       color: Colors.grey[600],
@@ -143,22 +147,25 @@ class _VaccinationsScreenState extends State<VaccinationsScreen> {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('نوع اللقاح: ${vaccination.vaccineType}'),
-                          Text(
-                            'تاريخ اللقاح: ${_formatDate(vaccination.vaccinationDate)}',
-                          ),
-                          if (vaccination.nextVaccinationDate != null)
+                          Text('Hayvan Türü: ${vaccination.petType}'),
+                          Text('Aşı Adı: ${vaccination.vaccineName}'),
+                          if (vaccination.vaccineDate != null)
                             Text(
-                              'اللقاح القادم: ${_formatDate(vaccination.nextVaccinationDate!)}',
+                              'Aşı Tarihi: ${_formatDate(vaccination.vaccineDate!)}',
                             ),
-                          if (vaccination.veterinarianName != null)
-                            Text('الطبيب: ${vaccination.veterinarianName}'),
+                          if (vaccination.nextVaccineDate != null)
+                            Text(
+                              'Sonraki Aşı: ${_formatDate(vaccination.nextVaccineDate!)}',
+                            ),
+                          if (vaccination.notes != null &&
+                              vaccination.notes!.isNotEmpty)
+                            Text('Notlar: ${vaccination.notes}'),
                         ],
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () => _deleteVaccination(vaccination),
-                        tooltip: 'حذف',
+                        tooltip: 'Sil',
                       ),
                       isThreeLine: true,
                     ),

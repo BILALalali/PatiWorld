@@ -34,7 +34,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('كلمات المرور غير متطابقة'),
+          content: Text('Şifreler eşleşmiyor'),
           backgroundColor: Colors.red,
         ),
       );
@@ -55,7 +55,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم إضافة المشرف بنجاح'),
+            content: Text('Yönetici başarıyla eklendi'),
             backgroundColor: Colors.green,
           ),
         );
@@ -95,7 +95,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'إضافة مشرف جديد',
+                'Yeni Yönetici Ekle',
                 style: TextStyle(
                   fontSize: AppConstants.titleFontSize,
                   fontWeight: FontWeight.bold,
@@ -106,7 +106,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  labelText: 'البريد الإلكتروني',
+                  labelText: 'E-posta',
                   prefixIcon: const Icon(Icons.email),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(
@@ -116,10 +116,10 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال البريد الإلكتروني';
+                    return 'Lütfen e-posta adresini girin';
                   }
                   if (!value.contains('@')) {
-                    return 'يرجى إدخال بريد إلكتروني صحيح';
+                    return 'Lütfen geçerli bir e-posta adresi girin';
                   }
                   return null;
                 },
@@ -128,7 +128,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
               TextFormField(
                 controller: _fullNameController,
                 decoration: InputDecoration(
-                  labelText: 'اسم المشرف',
+                  labelText: 'Yönetici Adı',
                   prefixIcon: const Icon(Icons.person),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(
@@ -138,7 +138,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال اسم المشرف';
+                    return 'Lütfen yönetici adını girin';
                   }
                   return null;
                 },
@@ -148,7 +148,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
                 controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  labelText: 'كلمة المرور',
+                  labelText: 'Şifre',
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -170,10 +170,10 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال كلمة المرور';
+                    return 'Lütfen şifreyi girin';
                   }
                   if (value.length < 6) {
-                    return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                    return 'Şifre en az 6 karakter olmalıdır';
                   }
                   return null;
                 },
@@ -183,7 +183,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
                 controller: _confirmPasswordController,
                 obscureText: _obscureConfirmPassword,
                 decoration: InputDecoration(
-                  labelText: 'تأكيد كلمة المرور',
+                  labelText: 'Şifreyi Onayla',
                   prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -205,7 +205,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'يرجى تأكيد كلمة المرور';
+                    return 'Lütfen şifreyi onaylayın';
                   }
                   return null;
                 },
@@ -236,7 +236,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
                           ),
                         )
                       : const Text(
-                          'إضافة مشرف',
+                          'Yönetici Ekle',
                           style: TextStyle(fontSize: 16),
                         ),
                 ),

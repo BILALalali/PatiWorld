@@ -35,12 +35,12 @@ class AdminAuthService {
           .maybeSingle();
 
       if (response == null) {
-        throw Exception('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+        throw Exception('E-posta veya şifre hatalı');
       }
 
       // Verify password
       if (response['password_hash'] != hashedPassword) {
-        throw Exception('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+        throw Exception('E-posta veya şifre hatalı');
       }
 
       final admin = Admin.fromJson(response);
@@ -62,7 +62,7 @@ class AdminAuthService {
       await prefs.remove(_adminIdKey);
       await prefs.remove(_adminEmailKey);
     } catch (e) {
-      throw Exception('فشل تسجيل الخروج: ${e.toString()}');
+      throw Exception('Çıkış yapılırken hata oluştu: ${e.toString()}');
     }
   }
 
@@ -123,7 +123,7 @@ class AdminAuthService {
           .maybeSingle();
 
       if (existingAdmin != null) {
-        throw Exception('البريد الإلكتروني مستخدم بالفعل');
+        throw Exception('Bu e-posta adresi zaten kullanılıyor');
       }
 
       final hashedPassword = _hashPassword(password);
@@ -141,7 +141,7 @@ class AdminAuthService {
 
       return Admin.fromJson(response);
     } catch (e) {
-      throw Exception('فشل إنشاء المشرف: ${e.toString()}');
+      throw Exception('Yönetici oluşturulurken hata oluştu: ${e.toString()}');
     }
   }
 
@@ -166,7 +166,7 @@ class AdminAuthService {
             .maybeSingle();
 
         if (existingAdmin != null) {
-          throw Exception('البريد الإلكتروني مستخدم بالفعل');
+          throw Exception('Bu e-posta adresi zaten kullanılıyor');
         }
         updates['email'] = email;
       }
@@ -184,7 +184,7 @@ class AdminAuthService {
 
       return Admin.fromJson(response);
     } catch (e) {
-      throw Exception('فشل تحديث المشرف: ${e.toString()}');
+      throw Exception('Yönetici güncellenirken hata oluştu: ${e.toString()}');
     }
   }
 
@@ -193,7 +193,7 @@ class AdminAuthService {
     try {
       await _supabase.from(AppConstants.adminsTable).delete().eq('id', adminId);
     } catch (e) {
-      throw Exception('فشل حذف المشرف: ${e.toString()}');
+      throw Exception('Yönetici silinirken hata oluştu: ${e.toString()}');
     }
   }
 
@@ -209,7 +209,7 @@ class AdminAuthService {
           .map((json) => Admin.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw Exception('فشل جلب المشرفين: ${e.toString()}');
+      throw Exception('Yöneticiler getirilirken hata oluştu: ${e.toString()}');
     }
   }
 }

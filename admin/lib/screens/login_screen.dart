@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: AppConstants.largePadding),
                       Text(
-                        'لوحة تحكم الإدارة',
+                        'Yönetim Paneli',
                         style: TextStyle(
                           fontSize: AppConstants.titleFontSize,
                           fontWeight: FontWeight.bold,
@@ -106,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: AppConstants.mediumPadding),
                       Text(
-                        'تسجيل الدخول',
+                        'Giriş Yap',
                         style: TextStyle(
                           fontSize: AppConstants.subtitleFontSize,
                           color: Colors.grey[600],
@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          labelText: 'البريد الإلكتروني',
+                          labelText: 'E-posta',
                           prefixIcon: const Icon(Icons.email),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(
@@ -127,10 +127,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'يرجى إدخال البريد الإلكتروني';
+                            return 'Lütfen e-posta adresinizi girin';
                           }
                           if (!value.contains('@')) {
-                            return 'يرجى إدخال بريد إلكتروني صحيح';
+                            return 'Lütfen geçerli bir e-posta adresi girin';
                           }
                           return null;
                         },
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _passwordController,
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
-                          labelText: 'كلمة المرور',
+                          labelText: 'Şifre',
                           prefixIcon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'يرجى إدخال كلمة المرور';
+                            return 'Lütfen şifrenizi girin';
                           }
                           return null;
                         },
@@ -194,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 )
                               : const Text(
-                                  'تسجيل الدخول',
+                                  'Giriş Yap',
                                   style: TextStyle(fontSize: 16),
                                 ),
                         ),

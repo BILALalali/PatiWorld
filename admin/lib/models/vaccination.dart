@@ -1,42 +1,50 @@
 class Vaccination {
   final String id;
-  final String userId;
+  final String? userId;
   final String petName;
-  final String vaccineType;
-  final DateTime vaccinationDate;
-  final DateTime? nextVaccinationDate;
-  final String? veterinarianName;
+  final String petType;
+  final String vaccineName;
+  final DateTime? vaccineDate;
+  final DateTime? nextVaccineDate;
+  final int? vaccineNumber;
   final String? notes;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
 
   Vaccination({
     required this.id,
-    required this.userId,
+    this.userId,
     required this.petName,
-    required this.vaccineType,
-    required this.vaccinationDate,
-    this.nextVaccinationDate,
-    this.veterinarianName,
+    required this.petType,
+    required this.vaccineName,
+    this.vaccineDate,
+    this.nextVaccineDate,
+    this.vaccineNumber,
     this.notes,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
   });
 
   factory Vaccination.fromJson(Map<String, dynamic> json) {
     return Vaccination(
-      id: json['id'] as String,
-      userId: json['user_id'] as String,
-      petName: json['pet_name'] as String,
-      vaccineType: json['vaccine_type'] as String,
-      vaccinationDate: DateTime.parse(json['vaccination_date'] as String),
-      nextVaccinationDate: json['next_vaccination_date'] != null
-          ? DateTime.parse(json['next_vaccination_date'] as String)
+      id: json['id']?.toString() ?? '',
+      userId: json['user_id']?.toString(),
+      petName: json['pet_name']?.toString() ?? '',
+      petType: json['pet_type']?.toString() ?? '',
+      vaccineName: json['vaccine_name']?.toString() ?? '',
+      vaccineDate: json['vaccine_date'] != null
+          ? DateTime.tryParse(json['vaccine_date'].toString())
           : null,
-      veterinarianName: json['veterinarian_name'] as String?,
-      notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      nextVaccineDate: json['next_vaccine_date'] != null
+          ? DateTime.tryParse(json['next_vaccine_date'].toString())
+          : null,
+      vaccineNumber: json['vaccine_number'] != null
+          ? (json['vaccine_number'] is int
+                ? json['vaccine_number'] as int
+                : int.tryParse(json['vaccine_number'].toString()))
+          : null,
+      notes: json['notes']?.toString(),
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString())
+          : null,
     );
   }
 
@@ -45,13 +53,13 @@ class Vaccination {
       'id': id,
       'user_id': userId,
       'pet_name': petName,
-      'vaccine_type': vaccineType,
-      'vaccination_date': vaccinationDate.toIso8601String(),
-      'next_vaccination_date': nextVaccinationDate?.toIso8601String(),
-      'veterinarian_name': veterinarianName,
+      'pet_type': petType,
+      'vaccine_name': vaccineName,
+      'vaccine_date': vaccineDate?.toIso8601String(),
+      'next_vaccine_date': nextVaccineDate?.toIso8601String(),
+      'vaccine_number': vaccineNumber,
       'notes': notes,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
     };
   }
 }
