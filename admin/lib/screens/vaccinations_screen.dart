@@ -135,10 +135,10 @@ class _VaccinationsScreenState extends State<VaccinationsScreen> {
                       bottom: AppConstants.mediumPadding,
                     ),
                     child: ListTile(
-                      leading: const Icon(
+                      leading: Icon(
                         Icons.medical_services,
                         size: 50,
-                        color: Colors.blue,
+                        color: Color(AppConstants.primaryColor),
                       ),
                       title: Text(
                         vaccination.petName,

@@ -16,14 +16,14 @@ class AppConstants {
   static const String defaultAdminEmail = 'pati2003pati2003@gmail.com';
   static const String defaultAdminPassword = 'Sdra.2003';
 
-  // App Colors
-  static const int primaryColor = 0xFF1976D2; // Blue
-  static const int secondaryColor = 0xFF42A5F5; // Light Blue
-  static const int accentColor = 0xFF64B5F6; // Very Light Blue
-  static const int errorColor = 0xFFE57373; // Light Red
-  static const int warningColor = 0xFFFFB74D; // Orange
-  static const int successColor = 0xFF81C784; // Green
-  static const int infoColor = 0xFF64B5F6; // Light Blue
+  // App Colors (متوافقة مع تطبيق المستخدم)
+  static const int primaryColor = 0xFF2E7D32; // Yeşil (أخضر)
+  static const int secondaryColor = 0xFF4CAF50; // Açık yeşil (أخضر فاتح)
+  static const int accentColor = 0xFF81C784; // Çok açık yeşil (أخضر فاتح جداً)
+  static const int errorColor = 0xFFE57373; // Açık kırmızı (أحمر فاتح)
+  static const int warningColor = 0xFFFFB74D; // Turuncu (برتقالي)
+  static const int successColor = 0xFF81C784; // Green (أخضر)
+  static const int infoColor = 0xFF64B5F6; // Açık mavi (أزرق فاتح)
 
   // Text Styles
   static const double titleFontSize = 24.0;
