@@ -776,6 +776,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nextVaccineDate => 'Next Vaccine Date';
 
   @override
+  String get customVaccineName => 'Custom Vaccine Name';
+
+  @override
+  String get enterCustomVaccineName => 'Enter vaccine name';
+
+  @override
+  String get pleaseEnterCustomVaccineName => 'Please enter vaccine name';
+
+  @override
   String get petDetails => 'Pet Details';
 
   @override

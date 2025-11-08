@@ -778,6 +778,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get nextVaccineDate => 'Sonraki Aşı Tarihi';
 
   @override
+  String get customVaccineName => 'Özel Aşı Adı';
+
+  @override
+  String get enterCustomVaccineName => 'Aşı adını girin';
+
+  @override
+  String get pleaseEnterCustomVaccineName => 'Lütfen aşı adını girin';
+
+  @override
   String get petDetails => 'Hayvan Detayları';
 
   @override

@@ -1604,6 +1604,24 @@ abstract class AppLocalizations {
   /// **'Next Vaccine Date'**
   String get nextVaccineDate;
 
+  /// No description provided for @customVaccineName.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Vaccine Name'**
+  String get customVaccineName;
+
+  /// No description provided for @enterCustomVaccineName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter vaccine name'**
+  String get enterCustomVaccineName;
+
+  /// No description provided for @pleaseEnterCustomVaccineName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter vaccine name'**
+  String get pleaseEnterCustomVaccineName;
+
   /// No description provided for @petDetails.
   ///
   /// In en, this message translates to:
