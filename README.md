@@ -1,6 +1,41 @@
 # PatiWorld - عالم الحيوانات الأليفة
 
-تطبيق شامل لإدارة الحيوانات الأليفة يتكون من جزأين منفصلين: تطبيق المستخدمين وتطبيق الإدارة.
+تطبيق شامل لإدارة الحيوانات الأليفة مبني بـ Flutter، يتكون من تطبيقين منفصلين: تطبيق المستخدمين وتطبيق الإدارة.
+
+## 📱 التطبيقات
+
+### تطبيق المستخدمين (user/)
+- عرض وإدارة الحيوانات الأليفة
+- إعلانات المفقودات والتبني
+- جدول اللقاحات
+- شات بوت ذكي باستخدام Dialogflow
+- إدارة الملف الشخصي
+
+### تطبيق الإدارة (admin/)
+- لوحة تحكم شاملة
+- إدارة المستخدمين والحيوانات
+- التقارير والإحصائيات
+- إعدادات النظام
+
+## 🛠️ التقنيات
+
+- **Flutter & Dart**: إطار العمل الرئيسي
+- **Supabase**: قاعدة البيانات والخدمات الخلفية
+- **Dialogflow**: شات بوت ذكي للتفاعل مع المستخدمين
+- **Material Design 3**: تصميم الواجهات
+
+## 📊 قاعدة البيانات
+
+يستخدم التطبيق **Supabase** كقاعدة بيانات رئيسية مع الجداول التالية:
+- `users`: المستخدمين
+- `pets`: الحيوانات
+- `lost_pets`: إعلانات المفقودات
+- `adoption_pets`: إعلانات التبني
+- `vaccinations`: جدول اللقاحات
+
+## 🤖 شات بوت Dialogflow
+
+التطبيق يتضمن شات بوت ذكي يستخدم **Google Dialogflow** لتقديم مساعدة فورية للمستخدمين والإجابة على استفساراتهم حول الحيوانات الأليفة.
 
 ## 📁 هيكل المشروع
 
@@ -10,77 +45,99 @@ pati_world/
 │   ├── lib/
 │   ├── android/
 │   ├── ios/
-│   ├── web/
-│   └── ...
+│   └── assets/
 ├── admin/          # تطبيق الإدارة
 │   ├── lib/
 │   ├── android/
-│   ├── ios/
-│   ├── web/
-│   └── ...
+│   └── ios/
 └── README.md
 ```
 
-## 🚀 الميزات
+## 🚀 التشغيل
 
-### تطبيق المستخدمين (user/)
-- **الشاشة الرئيسية**: عرض معلومات الحيوانات الأليفة
-- **إعلانات المفقودات**: إضافة وعرض الحيوانات المفقودة
-- **إعلانات التبني**: إضافة وعرض الحيوانات للتبني
-- **جدول اللقاحات**: تتبع لقاحات الحيوانات
-- **حسابي**: إدارة الملف الشخصي
-
-### تطبيق الإدارة (admin/)
-- **لوحة التحكم**: إحصائيات شاملة
-- **إدارة المستخدمين**: عرض وإدارة المستخدمين
-- **إدارة الحيوانات**: إدارة جميع الإعلانات
-- **التقارير**: تقارير مفصلة وإحصائيات
-- **الإعدادات**: إعدادات النظام
-
-## 🛠️ التقنيات المستخدمة
-
-- **Flutter**: إطار العمل الرئيسي
-- **Dart**: لغة البرمجة
-- **Supabase**: قاعدة البيانات والخدمات الخلفية
-- **Material Design 3**: تصميم الواجهات
-
-## 📱 التشغيل
-
-### تشغيل تطبيق المستخدمين
+### تطبيق المستخدمين
 ```bash
 cd user
 flutter pub get
 flutter run
 ```
 
-### تشغيل تطبيق الإدارة
+### تطبيق الإدارة
 ```bash
 cd admin
 flutter pub get
 flutter run
 ```
 
-## 🎨 التصميم
+---
 
-- **تطبيق المستخدمين**: ألوان خضراء تعكس طبيعة الحيوانات
-- **تطبيق الإدارة**: ألوان زرقاء تعكس الطابع المهني
+# PatiWorld - Pet World
 
-## 📊 قاعدة البيانات
+A comprehensive pet management application built with Flutter, consisting of two separate apps: user app and admin app.
 
-يستخدم التطبيق Supabase كقاعدة بيانات رئيسية مع الجداول التالية:
-- `users`: المستخدمين
-- `pets`: الحيوانات
-- `lost_pets`: إعلانات المفقودات
-- `adoption_pets`: إعلانات التبني
-- `vaccinations`: جدول اللقاحات
+## 📱 Applications
 
-## 🔧 التطوير
+### User App (user/)
+- View and manage pets
+- Lost and adoption listings
+- Vaccination schedule
+- Intelligent chatbot using Dialogflow
+- Profile management
 
-1. استنساخ المشروع
-2. تثبيت Flutter SDK
-3. تشغيل `flutter pub get` في كل مجلد
-4. تشغيل التطبيق على الجهاز المطلوب
+### Admin App (admin/)
+- Comprehensive dashboard
+- User and pet management
+- Reports and statistics
+- System settings
 
-## 📄 الترخيص
+## 🛠️ Technologies
 
-هذا المشروع مخصص للاستخدام التعليمي والتطويري.
+- **Flutter & Dart**: Main framework
+- **Supabase**: Database and backend services
+- **Dialogflow**: Intelligent chatbot for user interaction
+- **Material Design 3**: UI design
+
+## 📊 Database
+
+The application uses **Supabase** as the main database with the following tables:
+- `users`: Users
+- `pets`: Pets
+- `lost_pets`: Lost pet listings
+- `adoption_pets`: Adoption listings
+- `vaccinations`: Vaccination schedule
+
+## 🤖 Dialogflow Chatbot
+
+The application includes an intelligent chatbot using **Google Dialogflow** to provide instant assistance to users and answer their queries about pets.
+
+## 📁 Project Structure
+
+```
+pati_world/
+├── user/           # User application
+│   ├── lib/
+│   ├── android/
+│   ├── ios/
+│   └── assets/
+├── admin/          # Admin application
+│   ├── lib/
+│   ├── android/
+│   └── ios/
+└── README.md
+```
+
+## 🚀 Running
+
+### User App
+```bash
+cd user
+flutter pub get
+flutter run
+```
+
+### Admin App
+```bash
+cd admin
+flutter pub get
+flutter run
+```
