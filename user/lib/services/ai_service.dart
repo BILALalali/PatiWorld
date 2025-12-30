@@ -24,7 +24,7 @@ class AIService {
 
   // API Configuration
   static const String _apiKey =
-      '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';
+      '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';
   static const String _apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
   static const String _model = 'openai/gpt-4o-mini';
 
@@ -59,11 +59,24 @@ class AIService {
   /// Returns a ChatMessage with the bot's response, or null on error
   Future<ChatMessage?> sendMessage(String message) async {
     try {
+      // Validate API key format
+      if (_apiKey.isEmpty || !_apiKey.startsWith('sk-or-v1-')) {
+        print('Invalid API key format');
+        return ChatMessage.bot(
+          'Yapılandırma hatası. Lütfen daha sonra tekrar deneyin.',
+        );
+      }
+
       // Add user message to conversation history
       _conversationHistory.add({'role': 'user', 'content': message});
 
       // Prepare the request body
       final requestBody = {'model': _model, 'messages': _conversationHistory};
+
+      // Debug: Print API key length (first and last 4 chars for security)
+      print(
+        'API Key check: ${_apiKey.substring(0, 10)}...${_apiKey.substring(_apiKey.length - 4)} (length: ${_apiKey.length})',
+      );
 
       // Make the API request
       final response = await http.post(
@@ -79,41 +92,77 @@ class AIService {
 
       // Check if the request was successful
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+        try {
+          final responseData =
+              jsonDecode(response.body) as Map<String, dynamic>;
 
-        // Extract the AI's response
-        if (responseData['choices'] != null &&
-            responseData['choices'] is List &&
-            (responseData['choices'] as List).isNotEmpty) {
-          final choice =
-              (responseData['choices'] as List).first as Map<String, dynamic>;
-          final messageContent = choice['message'] as Map<String, dynamic>;
-          final aiResponse = messageContent['content'] as String? ?? '';
+          // Extract the AI's response
+          if (responseData['choices'] != null &&
+              responseData['choices'] is List &&
+              (responseData['choices'] as List).isNotEmpty) {
+            final choice =
+                (responseData['choices'] as List).first as Map<String, dynamic>;
+            final messageContent = choice['message'] as Map<String, dynamic>;
+            final aiResponse = messageContent['content'] as String? ?? '';
 
-          if (aiResponse.isNotEmpty) {
-            // Add AI response to conversation history
-            _conversationHistory.add({
-              'role': 'assistant',
-              'content': aiResponse,
-            });
+            if (aiResponse.isNotEmpty) {
+              // Add AI response to conversation history
+              _conversationHistory.add({
+                'role': 'assistant',
+                'content': aiResponse,
+              });
 
-            return ChatMessage.bot(aiResponse);
+              return ChatMessage.bot(aiResponse);
+            }
           }
+
+          // If we reach here, the response format was unexpected
+          print('AI API Response format error: ${response.body}');
+          return ChatMessage.bot(
+            'Üzgünüm, bir yanıt oluşturamadım. Lütfen tekrar deneyin.',
+          );
+        } catch (parseError) {
+          print('Error parsing AI response: $parseError');
+          print('Response body: ${response.body}');
+          return ChatMessage.bot(
+            'Yanıt işlenirken bir hata oluştu. Lütfen tekrar deneyin.',
+          );
+        }
+      } else {
+        print('AI API Error: ${response.statusCode}');
+        print('Response body: ${response.body}');
+
+        // Remove the user message from history since the request failed
+        if (_conversationHistory.isNotEmpty &&
+            _conversationHistory.last['role'] == 'user') {
+          _conversationHistory.removeLast();
         }
 
-        return ChatMessage.bot(
-          'Üzgünüm, bir yanıt oluşturamadım. Lütfen tekrar deneyin.',
-        );
-      } else {
-        print('AI API Error: ${response.statusCode} - ${response.body}');
-        return ChatMessage.bot(
-          'Sohbet botu ile iletişimde bir hata oluştu. Lütfen tekrar deneyin.',
-        );
+        String errorMessage = 'Sohbet botu ile iletişimde bir hata oluştu.';
+        if (response.statusCode == 401) {
+          errorMessage =
+              'Kimlik doğrulama hatası. Lütfen daha sonra tekrar deneyin.';
+        } else if (response.statusCode == 429) {
+          errorMessage =
+              'Çok fazla istek. Lütfen birkaç saniye sonra tekrar deneyin.';
+        } else if (response.statusCode >= 500) {
+          errorMessage = 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.';
+        }
+
+        return ChatMessage.bot(errorMessage);
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Error sending message to AI: $e');
+      print('Stack trace: $stackTrace');
+
+      // Remove the user message from history since the request failed
+      if (_conversationHistory.isNotEmpty &&
+          _conversationHistory.last['role'] == 'user') {
+        _conversationHistory.removeLast();
+      }
+
       return ChatMessage.bot(
-        'Sohbet botu ile iletişimde bir hata oluştu. Lütfen tekrar deneyin.',
+        'Bağlantı hatası oluştu. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.',
       );
     }
   }
