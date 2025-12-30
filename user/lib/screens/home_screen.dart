@@ -69,15 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: AppConstants.smallPadding),
-            child: ChatBotButton.icon(
-              icon: Icons.chat_bubble_outline,
-              tooltip: 'Sohbet Botu',
-            ),
-          ),
-        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

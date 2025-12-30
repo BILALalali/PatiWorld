@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/chat_message.dart';
-import '../services/dialogflow_service.dart';
+import '../services/ai_service.dart';
 import '../constants/app_constants.dart';
 
-/// A dialog/bottom sheet widget for chatting with the DialogFlow chatbot
+/// A dialog/bottom sheet widget for chatting with the AI chatbot
 ///
 /// This widget follows OOP principles by:
 /// - Encapsulating chat UI logic
@@ -24,7 +24,7 @@ class _ChatDialogState extends State<ChatDialog> {
   final List<ChatMessage> _messages = [];
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final DialogFlowService _dialogFlowService = DialogFlowService();
+  final AIService _aiService = AIService();
   bool _isLoading = false;
   bool _isInitialized = false;
 
@@ -34,13 +34,13 @@ class _ChatDialogState extends State<ChatDialog> {
     _initializeChat();
   }
 
-  /// Initializes the DialogFlow service
+  /// Initializes the AI service
   Future<void> _initializeChat() async {
     setState(() {
       _isLoading = true;
     });
 
-    final initialized = await _dialogFlowService.initialize();
+    final initialized = await _aiService.initialize();
 
     if (initialized && mounted) {
       setState(() {
@@ -81,7 +81,7 @@ class _ChatDialogState extends State<ChatDialog> {
     _scrollToBottom();
 
     // Get bot response
-    final botMessage = await _dialogFlowService.sendMessage(text);
+    final botMessage = await _aiService.sendMessage(text);
 
     if (mounted) {
       setState(() {
