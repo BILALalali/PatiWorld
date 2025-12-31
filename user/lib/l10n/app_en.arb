@@ -308,5 +308,23 @@
          "catsArePopularPets": "Cats are one of the most popular pets in the world",
          "dogsAreBestFriends": "Dogs are man's best friend and most loyal animals",
          "catCareInstructions": "Requires regular litter cleaning and vaccinations",
-         "dogCareInstructions": "Requires daily exercise and regular training"
+         "dogCareInstructions": "Requires daily exercise and regular training",
+         "failedToLoadStatistics": "Failed to load statistics",
+         "totalVaccines": "Total Vaccines",
+         "scheduledVaccines": "Scheduled Vaccines",
+         "upcomingVaccines": "Upcoming Vaccines (7 days)",
+         "expiredVaccines": "Expired Vaccines",
+         "vaccineCount": "{count} Vaccine",
+         "@vaccineCount": {
+           "placeholders": {
+             "count": {
+               "type": "int"
+             }
+           }
+         },
+         "tip": "Tip",
+         "vaccinationTip": "Be sure to update vaccine appointments regularly to ensure the health of your pet. You can add reminders for upcoming vaccines.",
+         "vaccinationUpdatedSuccessfully": "Vaccination updated successfully",
+         "vaccinationAddedSuccessfully": "Vaccination added successfully",
+         "failedToSaveVaccination": "Failed to save vaccination"
        }

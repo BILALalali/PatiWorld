@@ -864,4 +864,40 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get dogCareInstructions =>
       'Günlük egzersiz ve düzenli eğitim gerektirir';
+
+  @override
+  String get failedToLoadStatistics => 'İstatistikler yüklenirken hata oluştu';
+
+  @override
+  String get totalVaccines => 'Toplam Aşılar';
+
+  @override
+  String get scheduledVaccines => 'Planlanan Aşılar';
+
+  @override
+  String get upcomingVaccines => 'Yaklaşan Aşılar (7 Gün)';
+
+  @override
+  String get expiredVaccines => 'Süresi Dolan Aşılar';
+
+  @override
+  String vaccineCount(int count) {
+    return '$count Aşı';
+  }
+
+  @override
+  String get tip => 'İpucu';
+
+  @override
+  String get vaccinationTip =>
+      'Evcil hayvanınızın sağlığını garanti altına almak için aşı takvimlerini düzenli olarak güncelleyin. Yaklaşan aşılar için hatırlatıcılar ekleyebilirsiniz.';
+
+  @override
+  String get vaccinationUpdatedSuccessfully => 'Aşı başarıyla güncellendi';
+
+  @override
+  String get vaccinationAddedSuccessfully => 'Aşı başarıyla eklendi';
+
+  @override
+  String get failedToSaveVaccination => 'Aşı kaydedilirken hata oluştu';
 }

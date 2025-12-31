@@ -39,7 +39,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
       final vaccination = widget.vaccinationToEdit!;
       _petNameController.text = vaccination.petName;
       _selectedPetType = vaccination.petType;
-      
+
       // Check if the vaccine name is in the predefined list
       if (AppConstants.vaccineTypes.contains(vaccination.vaccineName)) {
         _selectedVaccineType = vaccination.vaccineName;
@@ -48,7 +48,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
         _selectedVaccineType = 'Diğer';
         _customVaccineNameController.text = vaccination.vaccineName;
       }
-      
+
       _vaccineDate = vaccination.vaccineDate;
       _nextVaccineDate = vaccination.nextVaccineDate.isBefore(DateTime.now())
           ? DateTime.now().add(const Duration(days: 30))
@@ -519,7 +519,7 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
   }
 
   Future<void> _selectNextVaccineDate() async {
-    // التأكد من أن التاريخ الافتراضي ليس في الماضي
+    // Varsayılan tarihin geçmişte olmadığından emin ol
     final initialDate = _nextVaccineDate.isBefore(DateTime.now())
         ? DateTime.now().add(const Duration(days: 30))
         : _nextVaccineDate;
@@ -579,22 +579,28 @@ class _AddVaccinationScreenState extends State<AddVaccinationScreen> {
         userId: user.id,
       );
 
+      final l10n = AppLocalizations.of(context)!;
+
       if (widget.vaccinationToEdit != null) {
-        // تحديث لقاح موجود
+        // Mevcut aşıyı güncelle
         await VaccinationService.updateVaccination(vaccination);
-        _showSuccessSnackBar('تم تحديث اللقاح بنجاح');
+        _showSuccessSnackBar(l10n.vaccinationUpdatedSuccessfully);
       } else {
-        // إضافة لقاح جديد
+        // Yeni aşı ekle
         await VaccinationService.addVaccination(vaccination);
-        _showSuccessSnackBar('تم إضافة اللقاح بنجاح');
+        _showSuccessSnackBar(l10n.vaccinationAddedSuccessfully);
       }
 
       if (mounted) {
-        Navigator.pop(context, true); // إرجاع true للإشارة إلى نجاح العملية
+        Navigator.pop(
+          context,
+          true,
+        ); // İşlemin başarılı olduğunu belirtmek için true döndür
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('فشل في حفظ اللقاح: $e');
+        final l10n = AppLocalizations.of(context)!;
+        _showErrorSnackBar('${l10n.failedToSaveVaccination}: $e');
       }
     } finally {
       if (mounted) {

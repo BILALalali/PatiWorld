@@ -862,4 +862,41 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dogCareInstructions =>
       'Requires daily exercise and regular training';
+
+  @override
+  String get failedToLoadStatistics => 'Failed to load statistics';
+
+  @override
+  String get totalVaccines => 'Total Vaccines';
+
+  @override
+  String get scheduledVaccines => 'Scheduled Vaccines';
+
+  @override
+  String get upcomingVaccines => 'Upcoming Vaccines (7 days)';
+
+  @override
+  String get expiredVaccines => 'Expired Vaccines';
+
+  @override
+  String vaccineCount(int count) {
+    return '$count Vaccine';
+  }
+
+  @override
+  String get tip => 'Tip';
+
+  @override
+  String get vaccinationTip =>
+      'Be sure to update vaccine appointments regularly to ensure the health of your pet. You can add reminders for upcoming vaccines.';
+
+  @override
+  String get vaccinationUpdatedSuccessfully =>
+      'Vaccination updated successfully';
+
+  @override
+  String get vaccinationAddedSuccessfully => 'Vaccination added successfully';
+
+  @override
+  String get failedToSaveVaccination => 'Failed to save vaccination';
 }

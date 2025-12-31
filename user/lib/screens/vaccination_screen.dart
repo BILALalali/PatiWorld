@@ -84,7 +84,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
             ),
           );
 
-          // تحديث القائمة إذا تم إضافة أو تعديل لقاح
+          // Aşı eklendi veya düzenlendiyse listeyi güncelle
           if (result == true) {
             _loadVaccinations();
           }
@@ -396,7 +396,7 @@ class _VaccinationScreenState extends State<VaccinationScreen> {
       ),
     );
 
-    // تحديث القائمة إذا تم تعديل اللقاح
+    // Aşı düzenlendiyse listeyi güncelle
     if (result == true) {
       _loadVaccinations();
     }

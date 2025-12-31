@@ -1771,6 +1771,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Requires daily exercise and regular training'**
   String get dogCareInstructions;
+
+  /// No description provided for @failedToLoadStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load statistics'**
+  String get failedToLoadStatistics;
+
+  /// No description provided for @totalVaccines.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Vaccines'**
+  String get totalVaccines;
+
+  /// No description provided for @scheduledVaccines.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled Vaccines'**
+  String get scheduledVaccines;
+
+  /// No description provided for @upcomingVaccines.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Vaccines (7 days)'**
+  String get upcomingVaccines;
+
+  /// No description provided for @expiredVaccines.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired Vaccines'**
+  String get expiredVaccines;
+
+  /// No description provided for @vaccineCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Vaccine'**
+  String vaccineCount(int count);
+
+  /// No description provided for @tip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip'**
+  String get tip;
+
+  /// No description provided for @vaccinationTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Be sure to update vaccine appointments regularly to ensure the health of your pet. You can add reminders for upcoming vaccines.'**
+  String get vaccinationTip;
+
+  /// No description provided for @vaccinationUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccination updated successfully'**
+  String get vaccinationUpdatedSuccessfully;
+
+  /// No description provided for @vaccinationAddedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccination added successfully'**
+  String get vaccinationAddedSuccessfully;
+
+  /// No description provided for @failedToSaveVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save vaccination'**
+  String get failedToSaveVaccination;
 }
 
 class _AppLocalizationsDelegate

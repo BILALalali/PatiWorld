@@ -308,5 +308,23 @@
          "catsArePopularPets": "Kediler dünyada en popüler evcil hayvanlardan biridir",
          "dogsAreBestFriends": "Köpekler insanın en iyi dostu ve en sadık hayvanlarıdır",
          "catCareInstructions": "Düzenli kum temizliği ve aşılar gerektirir",
-         "dogCareInstructions": "Günlük egzersiz ve düzenli eğitim gerektirir"
+         "dogCareInstructions": "Günlük egzersiz ve düzenli eğitim gerektirir",
+         "failedToLoadStatistics": "İstatistikler yüklenirken hata oluştu",
+         "totalVaccines": "Toplam Aşılar",
+         "scheduledVaccines": "Planlanan Aşılar",
+         "upcomingVaccines": "Yaklaşan Aşılar (7 Gün)",
+         "expiredVaccines": "Süresi Dolan Aşılar",
+         "vaccineCount": "{count} Aşı",
+         "@vaccineCount": {
+           "placeholders": {
+             "count": {
+               "type": "int"
+             }
+           }
+         },
+         "tip": "İpucu",
+         "vaccinationTip": "Evcil hayvanınızın sağlığını garanti altına almak için aşı takvimlerini düzenli olarak güncelleyin. Yaklaşan aşılar için hatırlatıcılar ekleyebilirsiniz.",
+         "vaccinationUpdatedSuccessfully": "Aşı başarıyla güncellendi",
+         "vaccinationAddedSuccessfully": "Aşı başarıyla eklendi",
+         "failedToSaveVaccination": "Aşı kaydedilirken hata oluştu"
        }
