@@ -12,6 +12,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'PatiWorld';
 
   @override
+  String get addLostPetListing => 'Add Lost Pet Listing';
+
+  @override
+  String get addFoundPetListing => 'Add Found Pet Listing';
+
+  @override
+  String get addPet => 'Add Pet';
+
+  @override
+  String get addFoundPet => 'Add Found Pet';
+
+  @override
+  String get foundAnimalName => 'Found Animal';
+
+  @override
+  String get foundPetAddedSuccessfully => 'Found pet added successfully';
+
+  @override
+  String get errorAddingFoundPet => 'Error adding found pet';
+
+  @override
+  String get selectImage => 'Select Image';
+
+  @override
+  String get selectPetType => 'Select pet type';
+
+  @override
+  String get pleaseSelectPetType => 'Please select a pet type';
+
+  @override
+  String get enterBreed => 'Enter breed';
+
+  @override
+  String get pleaseEnterBreed => 'Please enter breed';
+
+  @override
+  String get selectCity => 'Select city';
+
+  @override
+  String get pleaseSelectCity => 'Please select a city';
+
+  @override
   String get welcome => 'Welcome';
 
   @override
@@ -640,9 +682,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String months(int count) {
     return '$count Months';
   }
-
-  @override
-  String get addLostPetListing => 'Add Lost Pet Listing';
 
   @override
   String get petName => 'Pet Name';

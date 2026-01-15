@@ -104,6 +104,90 @@ abstract class AppLocalizations {
   /// **'PatiWorld'**
   String get appTitle;
 
+  /// No description provided for @addLostPetListing.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Lost Pet Listing'**
+  String get addLostPetListing;
+
+  /// No description provided for @addFoundPetListing.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Found Pet Listing'**
+  String get addFoundPetListing;
+
+  /// No description provided for @addPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Pet'**
+  String get addPet;
+
+  /// No description provided for @addFoundPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Found Pet'**
+  String get addFoundPet;
+
+  /// No description provided for @foundAnimalName.
+  ///
+  /// In en, this message translates to:
+  /// **'Found Animal'**
+  String get foundAnimalName;
+
+  /// No description provided for @foundPetAddedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Found pet added successfully'**
+  String get foundPetAddedSuccessfully;
+
+  /// No description provided for @errorAddingFoundPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Error adding found pet'**
+  String get errorAddingFoundPet;
+
+  /// No description provided for @selectImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Image'**
+  String get selectImage;
+
+  /// No description provided for @selectPetType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select pet type'**
+  String get selectPetType;
+
+  /// No description provided for @pleaseSelectPetType.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a pet type'**
+  String get pleaseSelectPetType;
+
+  /// No description provided for @enterBreed.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter breed'**
+  String get enterBreed;
+
+  /// No description provided for @pleaseEnterBreed.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter breed'**
+  String get pleaseEnterBreed;
+
+  /// No description provided for @selectCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Select city'**
+  String get selectCity;
+
+  /// No description provided for @pleaseSelectCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a city'**
+  String get pleaseSelectCity;
+
   /// No description provided for @welcome.
   ///
   /// In en, this message translates to:
@@ -1339,12 +1423,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} Months'**
   String months(int count);
-
-  /// No description provided for @addLostPetListing.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Lost Pet Listing'**
-  String get addLostPetListing;
 
   /// No description provided for @petName.
   ///

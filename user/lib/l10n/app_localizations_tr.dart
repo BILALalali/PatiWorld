@@ -12,6 +12,48 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appTitle => 'PatiWorld';
 
   @override
+  String get addLostPetListing => 'Kayıp Hayvan İlanı Ekle';
+
+  @override
+  String get addFoundPetListing => 'Bulunan Hayvan İlanı Ekle';
+
+  @override
+  String get addPet => 'Hayvan Ekle';
+
+  @override
+  String get addFoundPet => 'Bulunan Hayvan Ekle';
+
+  @override
+  String get foundAnimalName => 'Bulunan Hayvan';
+
+  @override
+  String get foundPetAddedSuccessfully => 'Bulunan hayvan başarıyla eklendi';
+
+  @override
+  String get errorAddingFoundPet => 'Bulunan hayvan eklenirken hata oluştu';
+
+  @override
+  String get selectImage => 'Resim Seç';
+
+  @override
+  String get selectPetType => 'Evcil hayvan türü seçin';
+
+  @override
+  String get pleaseSelectPetType => 'Lütfen evcil hayvan türü seçin';
+
+  @override
+  String get enterBreed => 'Cins giriniz';
+
+  @override
+  String get pleaseEnterBreed => 'Lütfen cins giriniz';
+
+  @override
+  String get selectCity => 'Şehir seçiniz';
+
+  @override
+  String get pleaseSelectCity => 'Lütfen bir şehir seçiniz';
+
+  @override
   String get welcome => 'Hoş Geldiniz';
 
   @override
@@ -494,7 +536,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get activitySummary => 'Aktivite özetiniz';
 
   @override
-  String get lostPetListings => 'Kayıp Hayvan İlanları';
+  String get lostPetListings => 'Kayıp İlanları';
 
   @override
   String get adoptionListings => 'Sahiplendirme İlanları';
@@ -641,9 +683,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String months(int count) {
     return '$count Ay';
   }
-
-  @override
-  String get addLostPetListing => 'Kayıp Hayvan İlanı Ekle';
 
   @override
   String get petName => 'Hayvan Adı';

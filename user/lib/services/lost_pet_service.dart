@@ -136,6 +136,51 @@ class LostPetService {
     }
   }
 
+  /// Yeni bulunan hayvan ekle
+  static Future<LostPet> addFoundPet({
+    required String name,
+    required String type,
+    required String breed,
+    required String city,
+    required String contactNumber,
+    required String whatsappNumber,
+    String? imageUrl,
+    required String userId,
+  }) async {
+    try {
+      final foundPetData = {
+        'name': name,
+        'type': type,
+        'description': breed, // Using breed as description for found pets
+        'city': city,
+        'lost_date': DateTime.now().toIso8601String().split(
+          'T',
+        )[0], // Current date for found pets
+        'contact_number': contactNumber,
+        'whatsapp_number': whatsappNumber,
+        'image_url':
+            imageUrl ??
+            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
+        'age_months': null, // Not required for found pets initially
+        'gender': null, // Not required for found pets initially
+        'is_vaccinated': false, // Default
+        'is_neutered': false, // Default
+        'is_active': true,
+        'user_id': userId,
+      };
+
+      final response = await _supabase
+          .from(AppConstants.lostPetsTable)
+          .insert(foundPetData)
+          .select()
+          .single();
+
+      return LostPet.fromJson(response);
+    } catch (e) {
+      throw Exception('Bulunan hayvan ekleme başarısız: $e');
+    }
+  }
+
   /// Kayıp hayvanı güncelle
   static Future<LostPet> updateLostPet(LostPet lostPet) async {
     try {

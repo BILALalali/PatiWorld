@@ -7,6 +7,7 @@ class AppConstants {
   // Database Table Names
   static const String petsTable = 'pets';
   static const String lostPetsTable = 'lost_pets';
+  static const String foundPetsTable = 'found_pets';
   static const String adoptionPetsTable = 'adoption_pets';
   static const String vaccinationsTable = 'vaccinations';
   static const String usersTable = 'users';
@@ -77,6 +78,39 @@ class AppConstants {
     'Hamster',
     'Kaplumbağa',
     'Diğer',
+  ];
+
+  // Pet Types for Found Pets (limited to 3 types)
+  static const List<String> foundPetTypes = ['Kedi', 'Köpek', 'Kuş'];
+
+  // Cat Breeds
+  static const List<String> catBreeds = [
+    'Persian Cat',
+    'Siamese Cat',
+    'British Shorthair',
+    'Bengal Cat',
+    'Ragdoll',
+    'Maine Coon',
+    'Sphynx Cat',
+  ];
+
+  // Dog Breeds
+  static const List<String> dogBreeds = [
+    'Golden Retriever',
+    'German Shepherd',
+    'Labrador Retriever',
+    'Poodle',
+    'Pomeranian',
+    'Siberian Husky',
+  ];
+
+  // Bird Breeds
+  static const List<String> birdBreeds = [
+    'sparrow',
+    'parrot',
+    'canary',
+    'crow',
+    'pigeon',
   ];
 
   // Cities

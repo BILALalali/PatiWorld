@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/lost_pet.dart';
+import '../models/found_pet.dart';
 import '../constants/app_constants.dart';
 import '../services/lost_pet_service.dart';
+import '../services/found_pet_service.dart';
 import 'add_lost_pet_screen.dart';
+import 'add_found_pet_screen.dart';
 import '../l10n/app_localizations.dart';
 
 class LostPetsScreen extends StatefulWidget {
@@ -15,7 +18,9 @@ class LostPetsScreen extends StatefulWidget {
 
 class _LostPetsScreenState extends State<LostPetsScreen> {
   List<LostPet> lostPets = [];
-  List<LostPet> filteredLostPets = [];
+  List<FoundPet> foundPets = [];
+  List<dynamic> allPets = []; // Combined list for display
+  List<dynamic> filteredPets = [];
   bool isLoading = true;
   String searchQuery = '';
   String selectedType = 'All';
@@ -29,23 +34,48 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
 
   Future<void> _loadLostPets() async {
     try {
-      print('Loading lost pets...');
-      final pets = await LostPetService.getAllLostPets();
-      print('Loaded ${pets.length} lost pets');
-      for (var pet in pets) {
-        print('Pet: ${pet.name} - ${pet.type} - ${pet.city}');
-      }
       setState(() {
-        lostPets = pets;
+        isLoading = true;
+      });
+
+      // Load both lost pets and found pets
+      final lostPetsList = await LostPetService.getAllLostPets();
+      final foundPetsList = await FoundPetService.getAllFoundPets();
+
+      // Combine both lists
+      final combinedList = <dynamic>[];
+      combinedList.addAll(lostPetsList);
+      combinedList.addAll(foundPetsList);
+
+      // Sort by date (most recent first)
+      combinedList.sort((a, b) {
+        DateTime dateA, dateB;
+        if (a is LostPet) {
+          dateA = a.createdAt;
+        } else {
+          dateA = (a as FoundPet).createdAt;
+        }
+        if (b is LostPet) {
+          dateB = b.createdAt;
+        } else {
+          dateB = (b as FoundPet).createdAt;
+        }
+        return dateB.compareTo(dateA);
+      });
+
+      setState(() {
+        lostPets = lostPetsList;
+        foundPets = foundPetsList;
+        allPets = combinedList;
         _applyFilters();
         isLoading = false;
       });
-      print('Lost pets loaded successfully');
     } catch (e) {
-      print('Error loading lost pets: $e');
-      // Error loading lost pets
+      print('Error loading pets: $e');
       setState(() {
         lostPets = [];
+        foundPets = [];
+        allPets = [];
         isLoading = false;
       });
       if (mounted) {
@@ -61,49 +91,53 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
   }
 
   void _applyFilters() {
-    print('Applying filters...');
-    print('Total lost pets: ${lostPets.length}');
-    print('Search query: "$searchQuery"');
-    print('Selected type: "$selectedType"');
-    print('Selected city: "$selectedCity"');
-
     setState(() {
-      filteredLostPets = lostPets.where((pet) {
+      filteredPets = allPets.where((pet) {
+        String name, type, city, description;
+
+        if (pet is LostPet) {
+          name = pet.name;
+          type = pet.type;
+          city = pet.city;
+          description = pet.description;
+        } else if (pet is FoundPet) {
+          name = pet.name;
+          type = pet.type;
+          city = pet.city;
+          description = pet.breed;
+        } else {
+          return false;
+        }
+
         // Search filter
         if (searchQuery.isNotEmpty) {
           final query = searchQuery.toLowerCase();
-          if (!pet.name.toLowerCase().contains(query) &&
-              !pet.description.toLowerCase().contains(query) &&
-              !pet.type.toLowerCase().contains(query) &&
-              !pet.city.toLowerCase().contains(query)) {
+          if (!name.toLowerCase().contains(query) &&
+              !description.toLowerCase().contains(query) &&
+              !type.toLowerCase().contains(query) &&
+              !city.toLowerCase().contains(query)) {
             return false;
           }
         }
 
         // Type filter
-        if (selectedType != 'All' && pet.type != selectedType) {
+        if (selectedType != 'All' && type != selectedType) {
           return false;
         }
 
         // City filter
-        if (selectedCity != 'All' && pet.city != selectedCity) {
+        if (selectedCity != 'All' && city != selectedCity) {
           return false;
         }
 
         return true;
       }).toList();
     });
-
-    print('Filtered lost pets: ${filteredLostPets.length}');
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
-    print(
-      'Building LostPetsScreen - isLoading: $isLoading, lostPets: ${lostPets.length}, filteredLostPets: ${filteredLostPets.length}',
-    );
 
     return Scaffold(
       appBar: AppBar(
@@ -144,7 +178,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : filteredLostPets.isEmpty
+          : filteredPets.isEmpty
           ? _buildEmptyState()
           : Column(
               children: [
@@ -158,7 +192,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                       context,
                     ).colorScheme.primary.withValues(alpha: 0.1),
                     child: Text(
-                      '${filteredLostPets.length} sonuç bulundu',
+                      '${filteredPets.length} sonuç bulundu',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
@@ -166,28 +200,62 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                       ),
                     ),
                   ),
-                Expanded(child: _buildLostPetsList()),
+                Expanded(child: _buildPetsList()),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddLostPetScreen()),
-          ).then((_) => _loadLostPets());
-        },
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddPetOptions,
+        label: Text(l10n.addPet, style: const TextStyle(color: Colors.white)),
+        icon: const Icon(Icons.add, color: Colors.white),
         backgroundColor: Theme.of(context).colorScheme.primary,
-        child: const Icon(Icons.add, color: Colors.white),
       ),
+    );
+  }
+
+  void _showAddPetOptions() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.search_off),
+                title: Text(l10n.addLostPetListing),
+                onTap: () {
+                  Navigator.pop(bc);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddLostPetScreen(),
+                    ),
+                  ).then((_) => _loadLostPets());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.pets),
+                title: Text(l10n.addFoundPetListing),
+                onTap: () {
+                  Navigator.pop(bc);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const AddFoundPetScreen(), // This screen will be created next
+                    ),
+                  ).then((_) => _loadLostPets());
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildEmptyState() {
     final l10n = AppLocalizations.of(context)!;
-
-    print(
-      'Building empty state - lostPets: ${lostPets.length}, filteredLostPets: ${filteredLostPets.length}',
-    );
 
     return Center(
       child: Column(
@@ -213,11 +281,7 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
     );
   }
 
-  Widget _buildLostPetsList() {
-    print(
-      'Building lost pets list - filteredLostPets: ${filteredLostPets.length}',
-    );
-
+  Widget _buildPetsList() {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -231,9 +295,15 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
       ),
       child: ListView.builder(
         padding: const EdgeInsets.all(AppConstants.mediumPadding),
-        itemCount: filteredLostPets.length,
+        itemCount: filteredPets.length,
         itemBuilder: (context, index) {
-          return _buildLostPetCard(filteredLostPets[index]);
+          final pet = filteredPets[index];
+          if (pet is LostPet) {
+            return _buildLostPetCard(pet);
+          } else if (pet is FoundPet) {
+            return _buildFoundPetCard(pet);
+          }
+          return const SizedBox.shrink();
         },
       ),
     );
@@ -443,6 +513,258 @@ class _LostPetsScreenState extends State<LostPetsScreen> {
                   ],
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFoundPetCard(FoundPet foundPet) {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Use a slightly different shade of green (lighter/more blue-tinted)
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final foundPetColor =
+        Color.lerp(primaryColor, Colors.cyan, 0.2) ?? primaryColor;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppConstants.mediumPadding),
+      elevation: AppConstants.cardElevation,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Pet Image - Vertical on the left
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(AppConstants.mediumRadius),
+              bottomLeft: Radius.circular(AppConstants.mediumRadius),
+            ),
+            child: SizedBox(
+              width: 120,
+              height: 200,
+              child: Stack(
+                children: [
+                  Image.network(
+                    foundPet.imageUrl ??
+                        'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400',
+                    fit: BoxFit.cover,
+                    width: 120,
+                    height: 200,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 120,
+                      height: 200,
+                      color: Colors.grey[200],
+                      child: const Icon(
+                        Icons.pets,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        width: 120,
+                        height: 200,
+                        color: Colors.grey[200],
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
+                    },
+                  ),
+                  // Found badge overlay
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: foundPetColor.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        'Bulunan',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Pet Info - Next to the image
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(AppConstants.mediumPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name and Status
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          foundPet.name,
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: foundPetColor,
+                              ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: foundPetColor.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: foundPetColor.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Text(
+                          'Bulunan',
+                          style: TextStyle(
+                            color: foundPetColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: AppConstants.smallPadding),
+
+                  // Breed (as description)
+                  Text(
+                    foundPet.breed,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  const SizedBox(height: AppConstants.mediumPadding),
+
+                  // Pet Details
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildInfoChip(Icons.pets, foundPet.type, foundPetColor),
+                      _buildInfoChip(
+                        Icons.location_on,
+                        foundPet.city,
+                        Colors.green,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: AppConstants.smallPadding),
+
+                  // Found Date and Days Since
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildInfoChip(
+                        Icons.calendar_today,
+                        foundPet.formattedFoundDate,
+                        Colors.blue,
+                      ),
+                      _buildInfoChip(
+                        Icons.access_time,
+                        l10n.daysAgo(foundPet.daysSinceFound),
+                        Colors.orange,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: AppConstants.mediumPadding),
+
+                  // Contact Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            if (foundPet.contactNumber != null &&
+                                foundPet.contactNumber!.isNotEmpty) {
+                              _makePhoneCall(foundPet.contactNumber!);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('İletişim numarası mevcut değil'),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.phone, size: 18),
+                          label: Text(l10n.call),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppConstants.smallPadding),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            if (foundPet.whatsappNumber != null &&
+                                foundPet.whatsappNumber!.isNotEmpty) {
+                              _openWhatsApp(foundPet.whatsappNumber!);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('WhatsApp numarası mevcut değil'),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.message, size: 18),
+                          label: Text(l10n.whatsapp),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
