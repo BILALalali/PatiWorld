@@ -6,10 +6,18 @@
 
 ## 📋 خطوات الإعداد:
 
-### 1. Clone Repository:
+### 1. تحديث المشروع (إذا كنت مربوط من قبل):
+```bash
+cd PatiWorld  # أو المسار الذي clone فيه المشروع
+git pull origin main
+git lfs pull  # لتحميل ملفات AI Model الكبيرة
+```
+
+**أو إذا كان أول مرة:**
 ```bash
 git clone https://github.com/BILALalali/PatiWorld.git
 cd PatiWorld
+git lfs pull  # لتحميل ملفات AI Model الكبيرة
 ```
 
 ### 2. Setup Flutter App:
@@ -35,14 +43,20 @@ pip install -r requirements.txt
 ```
 
 #### ج. Model Files:
-الملفات موجودة تلقائياً في Repository (باستخدام Git LFS):
+الملفات موجودة على GitHub (باستخدام Git LFS):
 - `saved_models/final_model.keras` (~8.3 MB) ✅
 - `saved_models/best_model.keras` (~8.3 MB) ✅
 - `animal_features_db.pkl` (~8.5 MB) ✅
 
-**ملاحظة:** إذا لم تظهر الملفات بعد `git clone`:
+**ملاحظة:** بعد `git pull`، تأكد من تحميل ملفات LFS:
 ```bash
 git lfs pull
+```
+
+**للتحقق من وجود الملفات:**
+```bash
+ls -lh user/model_project/saved_models/*.keras
+ls -lh user/model_project/*.pkl
 ```
 
 #### د. إعداد Supabase:
