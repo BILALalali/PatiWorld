@@ -43,3 +43,20 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Python / AI Model files
+venv/
+env/
+ENV/
+*.pyc
+__pycache__/
+*.pkl
+*.keras
+*.h5
+*.pb
+.python-version
+
+# Large AI model files (use Git LFS if needed)
+user/model_project/saved_models/*.keras
+user/model_project/*.pkl
+user/model_project/animal_features_db.*
