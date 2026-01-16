@@ -50,13 +50,9 @@ env/
 ENV/
 *.pyc
 __pycache__/
-*.pkl
-*.keras
 *.h5
 *.pb
 .python-version
 
-# Large AI model files (use Git LFS if needed)
-user/model_project/saved_models/*.keras
-user/model_project/*.pkl
-user/model_project/animal_features_db.*
+# Note: *.keras and *.pkl are now tracked by Git LFS (see .gitattributes)
+# Don't ignore them here - Git LFS will handle them
