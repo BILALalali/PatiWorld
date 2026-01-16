@@ -1,8 +1,8 @@
 # 🚀 Setup Instructions for Collaborators
 
-## ⚠️ Important: AI Model Files
+## ✅ AI Model Files
 
-ملفات AI Model **غير موجودة** في Git لأنها كبيرة جداً. يجب الحصول عليها من Developer الذي درب النموذج.
+ملفات AI Model **موجودة على GitHub** باستخدام Git LFS (Large File Storage). سيتم تحميلها تلقائياً عند `git clone` أو `git pull`.
 
 ## 📋 خطوات الإعداد:
 
@@ -34,14 +34,16 @@ venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 ```
 
-#### ج. الحصول على Model Files:
-يجب أن تكون الملفات التالية موجودة:
-- `saved_models/final_model.keras` (~8.3 MB)
-- `animal_features_db.pkl` (~8.5 MB)
+#### ج. Model Files:
+الملفات موجودة تلقائياً في Repository (باستخدام Git LFS):
+- `saved_models/final_model.keras` (~8.3 MB) ✅
+- `saved_models/best_model.keras` (~8.3 MB) ✅
+- `animal_features_db.pkl` (~8.5 MB) ✅
 
-**إذا لم تكن موجودة:**
-- اطلبها من Developer الذي درب النموذج
-- أو من Google Drive / مكان آخر
+**ملاحظة:** إذا لم تظهر الملفات بعد `git clone`:
+```bash
+git lfs pull
+```
 
 #### د. إعداد Supabase:
 تأكد من وجود متغيرات البيئة في `api_server.py`:
@@ -99,5 +101,6 @@ app.run(host='0.0.0.0', port=5002, debug=True)
 ## 📝 Notes:
 
 - `venv/` غير موجود في Git (يجب إنشاؤه محلياً)
-- ملفات AI Model غير موجودة في Git (يجب الحصول عليها من developer)
+- ملفات AI Model موجودة على GitHub باستخدام **Git LFS** ✅
 - Port الافتراضي: **5001** (لأن 5000 مستخدم من AirPlay على macOS)
+- **Git LFS** مثبت تلقائياً مع Git - لا حاجة لتثبيت إضافي
