@@ -66,15 +66,23 @@ class _AddFoundPetScreenState extends State<AddFoundPetScreen> {
       });
 
       try {
-        // For now, we'll match without image URL
-        // In the future, when image is uploaded, we can use it for better matching
+        print('🔍 Searching for similar lost pets...');
+        print('   Type: $_selectedType');
+        print('   Breed: $_selectedBreed');
+        print('   City: $_selectedCity');
+        print('   Has Image: ${_image != null}');
+        
+        // Use AI image matching if image is selected, otherwise use text-based matching
         final similarPets = await AIMatchingService.findSimilarLostPets(
           type: _selectedType!,
           breed: _selectedBreed!,
           city: _selectedCity!,
-          imageUrl: null, // Will be used when AI image matching is implemented
+          imageUrl: null,
+          imageFile: _image, // Pass image file for AI matching
           limit: 5,
         );
+
+        print('✅ Found ${similarPets.length} similar pets');
 
         if (mounted) {
           setState(() {
@@ -82,12 +90,21 @@ class _AddFoundPetScreenState extends State<AddFoundPetScreen> {
             _isLoadingSimilarPets = false;
           });
         }
-      } catch (e) {
-        print('Error loading similar pets: $e');
+      } catch (e, stackTrace) {
+        print('❌ Error loading similar pets: $e');
+        print('Stack trace: $stackTrace');
         if (mounted) {
           setState(() {
             _isLoadingSimilarPets = false;
           });
+          // Show error message to user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Hata: Benzer hayvanlar yüklenirken bir sorun oluştu. ${e.toString()}'),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 3),
+            ),
+          );
         }
       }
     } else {
@@ -454,10 +471,32 @@ class _AddFoundPetScreenState extends State<AddFoundPetScreen> {
 
         // Loading or Results
         if (_isLoadingSimilarPets)
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppConstants.mediumPadding),
-              child: CircularProgressIndicator(),
+          Container(
+            padding: const EdgeInsets.all(AppConstants.mediumPadding),
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
+            ),
+            child: Row(
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                const SizedBox(width: AppConstants.smallPadding),
+                Expanded(
+                  child: Text(
+                    _image != null 
+                        ? 'AI ile benzer hayvanlar aranıyor...' 
+                        : 'Benzer hayvanlar aranıyor...',
+                    style: TextStyle(
+                      color: Colors.blue[700],
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
             ),
           )
         else if (_similarLostPets.isEmpty)
@@ -473,7 +512,9 @@ class _AddFoundPetScreenState extends State<AddFoundPetScreen> {
                 const SizedBox(width: AppConstants.smallPadding),
                 Expanded(
                   child: Text(
-                    'Benzer kayıp hayvan bulunamadı.',
+                    _image != null
+                        ? 'AI ile benzer kayıp hayvan bulunamadı. Lütfen daha sonra tekrar deneyin.'
+                        : 'Benzer kayıp hayvan bulunamadı.',
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 14,

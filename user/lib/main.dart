@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/auth_wrapper.dart';
 import 'constants/app_constants.dart';
 import 'services/language_service.dart';
+import 'services/animal_similarity_api.dart';
 import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
 
@@ -19,7 +20,28 @@ void main() async {
   final languageService = LanguageService();
   await languageService.initialize();
 
+  // Check AI API health (non-blocking)
+  _checkAIAPIHealth();
+
   runApp(PatiWorldApp(languageService: languageService));
+}
+
+/// Check if AI API is available (runs in background)
+Future<void> _checkAIAPIHealth() async {
+  try {
+    final response = await AnimalSimilarityAPI.checkHealth();
+    if (response.success) {
+      print('✅ AI API is ready and connected!');
+    } else {
+      print('⚠️ AI API is not available. Text-based matching will be used.');
+      print(
+        '   To enable AI: Run "python api_server.py" in model_project folder',
+      );
+    }
+  } catch (e) {
+    print('⚠️ Could not check AI API health: $e');
+    print('   AI features will use text-based matching as fallback.');
+  }
 }
 
 class PatiWorldApp extends StatelessWidget {
